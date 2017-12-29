@@ -1,7 +1,7 @@
 baseURL = "https://awesome-euler-dcfdd6.netlify.com"
 languageCode = "en-us"
 title = "Russell Cohen"
-theme = "ananke"
+theme = "ananke-forked"
 
 MetaDataFormat = "yaml"
 DefaultContentLanguage = "en"
@@ -26,5 +26,5 @@ enableRobotsTXT = true
   linkedin = ""
   # choose a background color from any on this page: http://tachyons.io/docs/themes/skins/ and preface it with "bg-"
   background_color_class = "bg-gray"
-  featured_image = "/images/bishop_sunrise.jpg"
+  featured_image = "/images/bishop_sunrise_2.jpg"
   recent_posts_number = 2
