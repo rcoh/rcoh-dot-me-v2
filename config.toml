@@ -24,7 +24,7 @@ pygmentsCodeFences = true
   instagram = "https://www.instagram.com/therealrussbuss/"
   youtube = ""
   github = "https://github.com/rcoh"
-  linkedin = "www.linkedin.com/in/russell-cohen-b75b9927"
+  linkedin = "https://www.linkedin.com/in/russell-cohen-b75b9927"
   # choose a background color from any on this page: http://tachyons.io/docs/themes/skins/ and preface it with "bg-"
   background_color_class = "bg-black"
   featured_image = "/images/bishop_sunrise_2.jpg"
