@@ -7,7 +7,7 @@ MetaDataFormat = "yaml"
 DefaultContentLanguage = "en"
 SectionPagesMenu = "main"
 Paginate = 3 # this is set low for demonstrating with dummy content. Set to a higher number
-googleAnalytics = ""
+googleAnalytics = "UA-111671237-1"
 enableRobotsTXT = true
 
 [sitemap]
@@ -18,7 +18,7 @@ enableRobotsTXT = true
 [params]
   mainSections = ["posts"]
   favicon = ""
-  description = "The last theme you'll ever need. Maybe."
+  description = "Russell Cohen's Blog and Website"
   facebook = ""
   instagram = ""
   youtube = ""
