@@ -15,18 +15,18 @@ Here are a few interesting things I found reading [the implementation](https://g
 If you append to a Python list and the backing array isn't big enough, the backing array must be expanded. When this happens, the backing array is grown by approximately 12%. Personally, I had assumed this growth factor was much larger. In Java `ArrayList` grows by 50% when expanded[^2] and in Ruby, `Array` grows by 100%.[^3] The Python implementation optimizes for memory usage over speed. Another reason to preallocate Python lists when possible.
 
 
-{{< highlight c >}}
+```c
 // essentially, the new_allocated = new_size + new_size / 8
 new_allocated = (size_t)newsize + (newsize >> 3) + 
     (newsize < 9 ? 3 : 6);
-{{< / highlight >}}
+```
 [link to CPython reallocation code](https://github.com/python/cpython/blob/1fb72d2ad243c965d4432b4e93884064001a2607/Objects/listobject.c#L59)
 
 ## Inserting at the beginning of the list
 Inserting at the beginning of a list takes linear time -- this isn't that surprising given the rest of the implementation, but it's good to know that `some_list.insert(0,value)` is rarely a good idea. A Reddit user reminded me of [Deques](https://docs.python.org/3/library/collections.html#collections.deque) which trade constant time insert and remove from both ends in exchange for constant time indexing.
 
 
-{{< highlight c >}}
+```c
 // First, shift all the values after our insertion point 
 // over by one
 for (i = n; --i >= where; ) 
@@ -37,26 +37,26 @@ Py_INCREF(v);
 // insert our actual item
 items[where] = v;
 return 0;
-{{< / highlight >}}
+```
 [link to CPython insertion code](https://github.com/python/cpython/blob/1fb72d2ad243c965d4432b4e93884064001a2607/Objects/listobject.c#L263-L267)
 
 ## Creating List slices
 Taking a slice of a list eg. `some_list[6:50]`is also a linear time operation in the size of the slice, so again, no magic. You could imagine optimizing this with some sort of copy-on-write semantics but the CPython code favors simplicity:
 
-{{< highlight c >}}
+```c
 for (i = 0; i < len; i++) {
   PyObject *v = src[i];
   Py_INCREF(v);
   dest[i] = v;
 }
-{{< / highlight >}}
+```
 [link to CPython slice code](https://github.com/python/cpython/blob/1fb72d2ad243c965d4432b4e93884064001a2607/Objects/listobject.c#L447-L451)
 
 ## Slice Assignment
 You can assign to a slice! I'm sure this is commonly known among professional Python developers, but I've never run into it in several years of python programming. 
 I only discovered when I came across the [`list_ass_slice(...)`](https://github.com/python/cpython/blob/1fb72d2ad243c965d4432b4e93884064001a2607/Objects/listobject.c#L574) function in the code. However, watch out on large lists -- [it needs to copy all items deleted from the original list which will briefly double the memory usage.](https://github.com/python/cpython/blob/1fb72d2ad243c965d4432b4e93884064001a2607/Objects/listobject.c#L576)
 
-{{< highlight python >}}
+```python
 >>> a = [1,2,3,4,5]
 >>> a[2:4] = 'a'
 >>> a
@@ -66,7 +66,7 @@ I only discovered when I came across the [`list_ass_slice(...)`](https://github.
 >>> a[2:4] = ['replace1', 'replace2', 'replace3']
 >>> a
 [1, 2, 'replace1', 'replace2', 'replace3', 5]
-{{< /highlight >}}
+```
 ## Sorting
 Python arrays are sorted with an algorithm known as "timsort". It's wildly complicated and described in detail in a [side document in the source tree](https://github.com/python/cpython/blob/master/Objects/listsort.txt). Roughly, it builds up longer and longer runs of sequential items and merges them. Unlike normal merge sort, it starts by looking for sections of the list that are already sorted (`runs` in the code). This allows it to take advantage of input data that is already partially sorted.
 An interesting tidbit: For sorting small arrays (or small sections of a larger array) of up to 64 elements[^4], timsort uses "binary sort". This is essentially insertion sort, but using binary search to insert the element into the correct location. It's actually an O(n^2) algorithm! An interesting example of real-world performance winning over algorithmic complexity in practice. [link](https://github.com/python/cpython/blob/1fb72d2ad243c965d4432b4e93884064001a2607/Objects/listobject.c#L1109)
