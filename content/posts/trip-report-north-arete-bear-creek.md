@@ -1,6 +1,6 @@
 ---
 title: "Trip Report: North Arete Bear Creek Spire"
-date: 2016-8-29T22:53:41-05:00
+date: 2016-08-29T22:53:41-05:00
 draft: true
 ---
 After 4 days climbing long moderates in Tuolumne Meadows, Eben and I were stoked to get out of the park for the weekend and escape the crowds on some eastside alpine rock. 
