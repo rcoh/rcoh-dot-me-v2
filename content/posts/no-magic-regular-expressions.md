@@ -3,12 +3,12 @@ title: "No Magic Regular Expressions"
 date: 2016-12-29T23:38:13-05:00
 draft: false
 ---
-This post is part 1 part of a 3 part series. 
-- [Part 1](https://rcoh.svbtle.com/no-magic-regular-expressions)
-- [Part 2](https://svbtle.com/regular-expressions-part-2)
-- [Part 3](https://rcoh.svbtle.com/no-magic-regular-expressions-part-3)
+The code for this post, as well as the post itself, are on [github](https://github.com/rcoh/toyregex).
 
-The code from this post, as well as the post itself, are on [github](https://github.com/rcoh/toyregex).
+This post is part 1 of a 3 part series.  
+[Part 1: Parsing]({{< ref "posts/no-magic-regular-expressions.md" >}})
+[Part 2: Generate an NFA]({{< ref "posts/no-magic-regular-expressions-part-2.md" >}})
+[Part 3: Evaluate an NFA]({{< ref "posts/no-magic-regular-expressions-part-3.md" >}})
 
 Until recently, regular expressions seemed magical to me. I never understood how you could determine if a string matched a given regular expression. Now I know! Here's how I implemented a basic regular expression engine in under 200 lines of code.
 ## The Spec ##
