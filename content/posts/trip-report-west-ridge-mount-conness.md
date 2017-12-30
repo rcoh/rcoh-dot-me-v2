@@ -2,6 +2,7 @@
 title: "Trip Report: The West Ridge Mount Conness"
 date: 2017-12-30T13:01:58-05:00
 draft: false
+featured_image: "/images/conness_header.jpg"
 ---
 Even if you go to bed at 9, getting up at 5AM is hard. It's always darker than you expect and it's usually freezing. In any case, [Calley](https://www.instagram.com/calleylmurphy/) and I crawled out of our respective vans at 5AM in the Tuolumne Meadows campground,
 shoveled down some cold cereal, and rolled out for the day's objective: the West Ridge of Mount Conness. [The climb](https://www.mountainproject.com/route/106167844/west-ridge). TM Herbert, legendary Tuolumne badass, described the climb as "2 Cathedrals stacked on top of each other." Coincidentally, it also boasts an approach at least twice as long as Cathedral, with 2000 feet of elevation gain and 1200 feet of elevation loss all in 4 miles of cross country hiking with tricky route finding. The (extremely optimistic) guidebook suggests 3-5 hours. Needless to say, we felt we needed an early start.
