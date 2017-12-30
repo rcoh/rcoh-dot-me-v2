@@ -10,5 +10,7 @@ I created a [chrome extension](https://chrome.google.com/webstore/detail/wikiped
 
 [![ab.dot.png](/images/ipa-example.png)](https://chrome.google.com/webstore/detail/wikipedia-ipa-speaker/jkgihpigffcfeebgedpklldebdibbnne)
 
+Done in an afternoon, it's almost certainly the highest users:time ratio of any project I've done. It simply extracts the IPA text from wikipedia and then uses Amazon Polly, a text-to-speech service provided by AWS to generate sound.
+
 
 
