@@ -1,5 +1,5 @@
 ---
-title: "Postgres Unique Constraints Deadlock"
+title: "How Postgres Unique Constraints Can Cause Deadlock"
 date: 2017-12-29T22:49:36-05:00
 draft: false
 ---
