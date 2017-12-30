@@ -1,2 +1,4 @@
 *.sw*
 public/
+
+.DS_STORE

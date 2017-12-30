@@ -1,5 +1,5 @@
 ---
-title: "No Magic Regular Expressions"
+title: "No Magic: Regular Expressions"
 date: 2016-12-29T23:38:13-05:00
 draft: false
 ---
