@@ -3,7 +3,7 @@ title: "Notes on CPython List Internals"
 date: 2017-12-29T13:02:41-05:00
 draft: false
 ---
-As I was learning to program, Python lists seemed totally magical to me. I imagined them as being implemented by some sort of magical datastructure that was part linked-list, part array that was perfect for everything. 
+As I was learning to program, Python lists seemed totally magical to me. I imagined them as being implemented by some sort of magical datastructure that was part linked-list, part array that was perfect for everything.
 
 As I grew as an engineer, it occurred that this was unlikely. I guessed (correctly) that rather than some sort of magical implementation, it was just backed by a resizable array. I decided to read the code and find out.
 
@@ -12,26 +12,27 @@ One of the nice things about CPython is the readable implementation. Although th
 Here are a few interesting things I found reading [the implementation](https://github.com/python/cpython/blob/master/Objects/listobject.c). Code snippets below come from the CPython source with explanatory comments added by me.
 
 ## List Resizing
-If you append to a Python list and the backing array isn't big enough, the backing array must be expanded. When this happens, the backing array is grown by approximately 12%. Personally, I had assumed this growth factor was much larger. In Java `ArrayList` grows by 50% when expanded[^2] and in Ruby, `Array` grows by 100%.[^3] The Python implementation optimizes for memory usage over speed. Another reason to preallocate Python lists when possible.
-
+If you append to a Python list and the backing array isn't big enough, the backing array must be expanded. When this happens, the backing array is grown by approximately 12%. Personally, I had assumed this growth factor was much larger. In Java `ArrayList` grows by 50% when expanded[^2] and in Ruby, `Array` grows by 100%.[^3]
 
 ```c
 // essentially, the new_allocated = new_size + new_size / 8
-new_allocated = (size_t)newsize + (newsize >> 3) + 
+new_allocated = (size_t)newsize + (newsize >> 3) +
     (newsize < 9 ? 3 : 6);
 ```
 [link to CPython reallocation code](https://github.com/python/cpython/blob/1fb72d2ad243c965d4432b4e93884064001a2607/Objects/listobject.c#L59)
+
+I did a few performance experiments -- preallocating arrays with constructs like `[None]*500` doesn't seem to make any noticeable difference. In my unscientific benchmark of appending to a list 100 million times, Python 3 was much slower than Python 2 which was much slower than Ruby, however, a lot more research is required to determine the impact (if any) of the growth factor on insert performance.
 
 ## Inserting at the beginning of the list
 Inserting at the beginning of a list takes linear time -- this isn't that surprising given the rest of the implementation, but it's good to know that `some_list.insert(0,value)` is rarely a good idea. A Reddit user reminded me of [Deques](https://docs.python.org/3/library/collections.html#collections.deque) which trade constant time insert and remove from both ends in exchange for constant time indexing.
 
 
 ```c
-// First, shift all the values after our insertion point 
+// First, shift all the values after our insertion point
 // over by one
-for (i = n; --i >= where; ) 
+for (i = n; --i >= where; )
   items[i+1] = items[i];
-// Increment the number of references to v (the value we're inserting) 
+// Increment the number of references to v (the value we're inserting)
 // for garbage collection
 Py_INCREF(v);
 // insert our actual item
@@ -53,7 +54,7 @@ for (i = 0; i < len; i++) {
 [link to CPython slice code](https://github.com/python/cpython/blob/1fb72d2ad243c965d4432b4e93884064001a2607/Objects/listobject.c#L447-L451)
 
 ## Slice Assignment
-You can assign to a slice! I'm sure this is commonly known among professional Python developers, but I've never run into it in several years of python programming. 
+You can assign to a slice! I'm sure this is commonly known among professional Python developers, but I've never run into it in several years of python programming.
 I only discovered when I came across the [`list_ass_slice(...)`](https://github.com/python/cpython/blob/1fb72d2ad243c965d4432b4e93884064001a2607/Objects/listobject.c#L574) function in the code. However, watch out on large lists -- [it needs to copy all items deleted from the original list which will briefly double the memory usage.](https://github.com/python/cpython/blob/1fb72d2ad243c965d4432b4e93884064001a2607/Objects/listobject.c#L576)
 
 ```python
@@ -81,4 +82,3 @@ Thanks to Leah Alpert for providing suggestions on this post.
 
 [^3]: https://github.com/ruby/ruby/blob/0d09ee1/array.c#L392
 [^4]: https://github.com/python/cpython/blob/1fb72d2ad243c965d4432b4e93884064001a2607/Objects/listobject.c#L1923
-
