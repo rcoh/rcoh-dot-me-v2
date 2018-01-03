@@ -3,8 +3,8 @@ title: "A Survey of Hash Map Implementations in Popular Languages"
 date: 2017-12-30T17:39:23-05:00
 draft: true
 ---
-Few data-structures are more ubiquitous in real-world development than the hash table. Nearly every major programming features an implementation in its standard library. Yet, there is no conclusive best strategy to implement one! The major programming languages diverge widely in their implementation strategy. I did a survey of the
-Hash map implementations in Go, Python, Ruby, Java, and Scala to compare on contrast hash map implementations.
+Few data-structures are more ubiquitous in real-world development than the hash table. Nearly every major programming features an implementation in its standard library or built into the runtime. Yet, there is no conclusive best strategy to implement one and the major programming languages diverge widely in their implementations! I did a survey of the
+Hash map implementations in Go, Python, Ruby, Java, and Scala to compare and contrast how they were implemented.
 
 **Note: The rest of this post assumes a working knowledge of how hash tables work along with the most common schemes for implementing them.** If you need a refresher, [Wikipedia](https://en.wikipedia.org/wiki/Hash_table) provides a fairly readable explanation. Beyond the basics, the sections on [chaining](https://en.wikipedia.org/wiki/Hash_table#Separate_chaining) and [open addressing](https://en.wikipedia.org/wiki/Hash_table#Open_addressing) should provide sufficient background.
 
@@ -56,7 +56,10 @@ Other bits of note:
 
 ## Java
 
-**Scheme:** Chaining, with linked lists that convert into TreeMaps when the length of lists > 8. This conversion is most helpful if K is comparable or if the hash codes collide but are not identical.
+**Scheme:** Chaining, with linked lists that convert into TreeMaps when the length of lists > 8. This conversion is most helpful if either:
+
+  - K implements `Comparable<>`
+  - The hash codes collide mod the table size but are not equal.
 
 **Growth rate:** 2x. The number of slots is always a power of 2
 
@@ -72,22 +75,21 @@ Other bits of note:
 
 ## Scala Immutable Hash Map
 
-[Source](https://github.com/rcoh/scala/blob/2.12.x/src/library/scala/collection/immutable/HashMap.scala)
+[Source](https://github.com/scala/scala/blob/2.12.x/src/library/scala/collection/immutable/HashMap.scala)
 Most hash map usage in Scala uses the immutable hash map, so I'll discuss that first.
 
-**Scheme:** Hash Trie with chaining. A hash trie is a recursive data structure (so it's hash tries all the way down). The [Scala doucmentation](http://docs.scala-lang.org/overviews/collections/concrete-immutable-collection-classes.html#hash-tries) provides a decent explanation. For an in depth summary, [Phil Bagwell's paper](https://infoscience.epfl.ch/record/64398/files/idealhashtrees.pdf) is an excellent resource. I'll provide a brief summary:
+**Scheme:** Hash Trie with chaining. A hash trie is a recursive data structure (so it's hash tries all the way down). The [Scala doucmentation](http://docs.scala-lang.org/overviews/collections/concrete-immutable-collection-classes.html#hash-tries) provides a decent explanation. For more depth, [Phil Bagwell's paper](https://infoscience.epfl.ch/record/64398/files/idealhashtrees.pdf) is an excellent resource. I'll provide a brief summary:
 
-Each level of the hash trie considers some subset of bits of the hash code. When inserting or retrieving, the implementation recurses into the branch of the trie matching the bits, using the next subset of bits as an argument. Since
+For maps of size 0 to 4, it uses hardcoded maps. For larger maps, it uses a HashTrie. Each level of the hash trie considers some subset of bits of the hash code. When inserting or retrieving, the implementation recurses into the branch of the trie matching the bits, using the next subset of bits as an argument. Since
 The Scala hash trie implementation has a branching factor of 32, each level considers 5 bits of the hash code (2^5 = 32).  Since hash codes in Java/Scala are 32-bit integers, this means that if all hash codes are unique, the hash trie will store 2^32 elements without collision.
 
 If the hash codes are identical, chaining is used, wrapped within the [`HashMapCollision`](https://github.com/scala/scala/blob/2.12.x/src/library/scala/collection/immutable/HashMap.scala#L239) data structure.
-
-For maps of size 0 to 4, it uses hardcoded maps.The code is pretty abstract and hard to wrap your head around, but   
 
 Scala also provides a mutable hash map. Since it lacks the optimizations of the other languages
 I looked at, it was the only one that was straightforward.
 
 ## Scala Mutable Hash Map
+[Source](https://github.com/scala/scala/blob/2.12.x/src/library/scala/collection/mutable/HashTable.scala)
 
 **Scheme:** Chaining with linked lists
 
@@ -95,7 +97,10 @@ I looked at, it was the only one that was straightforward.
 
 **Load factor:** 0.75
 
-Like many other implementations, it attempts to increase the entropy of the incoming hash codes with some mixing:
+Bits of note:
+
+- This is what I naively expected a hash map implementation to look like. It's under 500 lines, and the core is under 100 lines. It's straightforward, without complications and easy to read.
+- Like many other implementations, it attempts to increase the entropy of the incoming hash codes with some mixing:
 
 ```scala
    var h: Int = hcode + ~(hcode << 9)
