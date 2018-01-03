@@ -1,7 +1,7 @@
 ---
 title: "A Survey of Hash Map Implementations in Popular Languages"
 date: 2017-12-30T17:39:23-05:00
-draft: true
+draft: false
 ---
 Few data-structures are more ubiquitous in real-world development than the hash table. Nearly every major programming features an implementation in its standard library or built into the runtime. Yet, there is no conclusive best strategy to implement one and the major programming languages diverge widely in their implementations! I did a survey of the
 Hash map implementations in Go, Python, Ruby, Java, and Scala to compare and contrast how they were implemented.
