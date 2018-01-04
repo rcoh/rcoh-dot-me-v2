@@ -6,21 +6,21 @@ aliases:
  - /posts/hash-map-survey/
 ---
 Few data-structures are more ubiquitous in real-world development than the hash table. Nearly every major programming features an implementation in its standard library or built into the runtime. Yet, there is no conclusive best strategy to implement one and the major programming languages diverge widely in their implementations! I did a survey of the
-Hash map implementations in Go, Python, Ruby, Java, C#, and Scala to compare and contrast how they were implemented.
+Hash map implementations in Go, Python, Ruby, Java, C#, C++, and Scala to compare and contrast how they were implemented.
 
 **Note: The rest of this post assumes a working knowledge of how hash tables work along with the most common schemes for implementing them.** If you need a refresher, [Wikipedia](https://en.wikipedia.org/wiki/Hash_table) provides a fairly readable explanation. Beyond the basics, the sections on [chaining](https://en.wikipedia.org/wiki/Hash_table#Separate_chaining) and [open addressing](https://en.wikipedia.org/wiki/Hash_table#Open_addressing) should provide sufficient background.
 
 ## Summary
 Though all implementations differed significantly, certain commonalities remained:
 
-- Open addressing with double hashing (Python & Ruby) and chaining (Java, Scala, Go) were represented about equally
+- Open addressing (Python, Ruby, C++, C#) and chaining (Java, Scala, Go) were represented about equally
 - No "exotic" implementations like cuckoo hashing, etc in the surveyed languages although most implementations included varying degrees of optimizations that complicated the code significantly.
-- All languages attempt to add entropy to the hash code by mixing the lower and higher order bits at some point in the process. Interestingly, all the languages featured contained a primitive type with a low-entropy hash function that lead to this being a necessity.
+- Most languages attempt to add entropy to the hash code by mixing the lower and higher order bits at some point in the process. Those languages all contained a primitive type with a low-entropy hash function that lead to this being a necessity.
 - All grow by at least 2x. Most guarantee that the size is always a power of 2.
 
 On to the details:
 
-### Python (CPython)
+## Python (CPython)
 [Source](https://github.com/python/cpython/blob/master/Objects/dictobject.c)
 [Implementers Notes](https://github.com/python/cpython/blob/master/Objects/dictnotes.txt)
 
@@ -75,7 +75,9 @@ Other bits of note:
   convenience of factor-of-two resizing.
 - The code is really hard to follow, primarily due to the fact that chains can flip between trees and linked lists.
 
-## Scala Immutable Hash Map
+## Scala
+
+### Immutable Map
 
 [Source](https://github.com/scala/scala/blob/2.12.x/src/library/scala/collection/immutable/HashMap.scala)
 Most hash map usage in Scala uses the immutable hash map, so I'll discuss that first.
@@ -90,7 +92,7 @@ If the hash codes are identical, chaining is used, wrapped within the [`HashMapC
 Scala also provides a mutable hash map. Since it lacks the optimizations of the other languages
 I looked at, it was the only one that was straightforward.
 
-## Scala Mutable Hash Map
+### Mutable Hash Map
 [Source](https://github.com/scala/scala/blob/2.12.x/src/library/scala/collection/mutable/HashTable.scala)
 
 **Scheme:** Chaining with linked lists
@@ -132,7 +134,7 @@ Bits of note:
 
     In the case of #2, the newly allocated array is the same size as the old array. This seeming nonsensical behavior comes from this [commit](https://github.com/golang/go/commit/9980b70cb460f27907a003674ab1b9bea24a847c). In the case of deletions, allocating and slowly migrating to a new array means that we'll garbage collect the old buckets instead of slowly leaking them. They chose this approach to ensure that iterators continued to work properly.
 
-## C#
+## C\#
 [Source](https://github.com/dotnet/coreclr/blob/master/src/mscorlib/src/System/Collections/Hashtable.cs)
 [Implementers Notes](https://github.com/dotnet/coreclr/blob/master/src/mscorlib/src/System/Collections/Hashtable.cs#L71-L124)
 
@@ -154,10 +156,8 @@ Bits of note:
 - Unlike most other implementations, the c# implementation takes care to ensure that
   concurrent readers don't view invalid data during a resize.
 
-## C++
+## C++ (GCC STL)
 [Source](https://github.com/gcc-mirror/gcc/blob/master/gcc/hash-table.h)
-
-For C++, I looked at the GCC STL. There are other STLs that may implement it differently.
 
 **Scheme:** Open addressing with [double hashing](https://en.wikipedia.org/wiki/Double_hashing).
 ```
@@ -180,7 +180,7 @@ Bits of note:
 ### Wrap Up
 
 I find it fascinating that there are so many different implementations for hash tables used in the production languages. I found Ruby's shift from
-chaining to open addressing especially interesting since it apparently improved on benchmarks quite a bit. I would be interesting to write an open-addressed hashtable for Java or Go and compare performance.
+chaining to open addressing especially interesting since it apparently improved on benchmarks quite a bit. It would be interesting to write an open-addressed hash table for Java or Go and compare performance.
 
 Did I miss your favorite language? Let me know in the comments or by email, `*+hashtables@*.me` where `* = rcoh`.
 
@@ -188,4 +188,4 @@ Did I miss your favorite language? Let me know in the comments or by email, `*+h
 [^2]: https://github.com/python/cpython/blob/60c3d35/Objects/dictobject.c#L54-L63
 [^3]: https://github.com/python/cpython/blob/60c3d35/Objects/dictobject.c#L398-L408
 [^4]: https://github.com/python/cpython/blob/master/Objects/dictnotes.txt#L70
-[^5]: Perhaps surprisingly starting the Python interpreter and running a couple of non-dictionary related commands incurs about 100 dictionary lookups.
+[^5]: Perhaps surprisingly, starting the Python interpreter and running a couple of non-dictionary related commands incurs about 100 dictionary lookups.
