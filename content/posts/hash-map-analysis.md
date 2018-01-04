@@ -1,10 +1,12 @@
 ---
-title: "A Survey of Hash Map Implementations in Popular Languages"
+title: "An Analysis of Hash Map Implementations in Popular Languages"
 date: 2017-12-30T17:39:23-05:00
 draft: false
+aliases:
+ - /posts/hash-map-survey/
 ---
 Few data-structures are more ubiquitous in real-world development than the hash table. Nearly every major programming features an implementation in its standard library or built into the runtime. Yet, there is no conclusive best strategy to implement one and the major programming languages diverge widely in their implementations! I did a survey of the
-Hash map implementations in Go, Python, Ruby, Java, and Scala to compare and contrast how they were implemented.
+Hash map implementations in Go, Python, Ruby, Java, C#, and Scala to compare and contrast how they were implemented.
 
 **Note: The rest of this post assumes a working knowledge of how hash tables work along with the most common schemes for implementing them.** If you need a refresher, [Wikipedia](https://en.wikipedia.org/wiki/Hash_table) provides a fairly readable explanation. Beyond the basics, the sections on [chaining](https://en.wikipedia.org/wiki/Hash_table#Separate_chaining) and [open addressing](https://en.wikipedia.org/wiki/Hash_table#Open_addressing) should provide sufficient background.
 
@@ -14,7 +16,7 @@ Though all implementations differed significantly, certain commonalities remaine
 - Open addressing with double hashing (Python & Ruby) and chaining (Java, Scala, Go) were represented about equally
 - No "exotic" implementations like cuckoo hashing, etc in the surveyed languages although most implementations included varying degrees of optimizations that complicated the code significantly.
 - All languages attempt to add entropy to the hash code by mixing the lower and higher order bits at some point in the process. Interestingly, all the languages featured contained a primitive type with a low-entropy hash function that lead to this being a necessity.
-- All grow by 2x. Most guarantee that the size is always a power of 2.
+- All grow by at least 2x. Most guarantee that the size is always a power of 2.
 
 On to the details:
 
@@ -129,6 +131,51 @@ Bits of note:
     2. The number of buckets is too large.
 
     In the case of #2, the newly allocated array is the same size as the old array. This seeming nonsensical behavior comes from this [commit](https://github.com/golang/go/commit/9980b70cb460f27907a003674ab1b9bea24a847c). In the case of deletions, allocating and slowly migrating to a new array means that we'll garbage collect the old buckets instead of slowly leaking them. They chose this approach to ensure that iterators continued to work properly.
+
+## C#
+[Source](https://github.com/dotnet/coreclr/blob/master/src/mscorlib/src/System/Collections/Hashtable.cs)
+[Implementers Notes](https://github.com/dotnet/coreclr/blob/master/src/mscorlib/src/System/Collections/Hashtable.cs#L71-L124)
+
+**Scheme:** Open addressing with [double hashing](https://en.wikipedia.org/wiki/Double_hashing):
+
+```          
+double_hash(key, n) = h1(key) + n*h2(key)
+h1(key) = GetHash(key);  // default implementation calls key.GetHashCode();
+h2(key) = 1 + (((h1(key) >> 5) + 1) % (hashsize - 1));
+```
+
+**Growth Rate:** >2x. The new size is the smallest prime number greater than 2x the old size.
+
+**Load Factor:** 0.72
+
+Bits of note:
+
+- For reasons not clear to me, the actual load factor used by the hash table is 0.72x the load factor that you asked for.
+- Unlike most other implementations, the c# implementation takes care to ensure that
+  concurrent readers don't view invalid data during a resize.
+
+## C++
+[Source](https://github.com/gcc-mirror/gcc/blob/master/gcc/hash-table.h)
+
+For C++, I looked at the GCC STL. There are other STLs that may implement it differently.
+
+**Scheme:** Open addressing with [double hashing](https://en.wikipedia.org/wiki/Double_hashing).
+```
+// TABLE_SIZE is always prime
+double_hash(key, n) = h1(key) + n*h2(key)
+h1(key) = INPUT_HASH % TABLE_SIZE
+h2(key) = 1 + INPUT_HASH % (TABLE_SIZE-2)
+```
+
+**Growth Rate:** >2x. The new size is the smallest prime number greater than 2x the old size.
+
+**Load Factor:** 0.5
+
+Bits of note:
+
+- Similar to C# in growth behavior
+- Table size is always prime. This surprised me since I figured c++ would try to align on powers of 2 to help out malloc.
+- Load factor hard coded and not configurable
 
 ### Wrap Up
 
