@@ -10,11 +10,22 @@ Hash map implementations in Go, Python, Ruby, Java, C#, C++, and Scala to compar
 
 **Note: The rest of this post assumes a working knowledge of how hash tables work along with the most common schemes for implementing them.** If you need a refresher, [Wikipedia](https://en.wikipedia.org/wiki/Hash_table) provides a fairly readable explanation. Beyond the basics, the sections on [chaining](https://en.wikipedia.org/wiki/Hash_table#Separate_chaining) and [open addressing](https://en.wikipedia.org/wiki/Hash_table#Open_addressing) should provide sufficient background.
 
-## Summary
+For each hash map I'll compare:
+
+- **Scheme**: How does the hash table handle collisions? Any optimizations to the chosen strategy?
+- **Growth Rate**: When the hash table resizes, how much does it grow by?
+- **Load Factor**: How full (as a fraction of `num_keys/slots`) does the hash table need to be before resizing is triggered?
+
+Some vocabulary to keep in mind:
+
+- **Perturbation**: Many of the maps below always have a size that is a power of 2. `n % (i**2)` is equivalent to dropping some of the higher order bits. To combat this, the maps combine certain sections of the hash code with itself via xor or simple numeric addition. This ensures that the impact from the higher order bits is not lost.
+- **Tombstoning:** In open addressing when an item is deleted, it must marked as deleted instead of being removed completely. This is so that searches for elements further down the chain know to continue when hitting the "tombstone".
+
+
 Though all implementations differed significantly, certain commonalities remained:
 
-- Open addressing (Python, Ruby, C++, C#) and chaining (Java, Scala, Go) were represented about equally
-- No "exotic" implementations like cuckoo hashing, etc in the surveyed languages although most implementations included varying degrees of optimizations that complicated the code significantly.
+- Open addressing (Python, Ruby, C++) and chaining (Java, Scala, Go) were represented about equally
+- No "exotic" implementations like [cuckoo hashing](https://en.wikipedia.org/wiki/Cuckoo_hashing), etc in the surveyed languages although most implementations included varying degrees of optimizations that complicated the code significantly.
 - Most languages attempt to add entropy to the hash code by mixing the lower and higher order bits at some point in the process. Those languages all contained a primitive type with a low-entropy hash function that lead to this being a necessity.
 - All grow by at least 2x. Most guarantee that the size is always a power of 2.
 
@@ -24,37 +35,43 @@ On to the details:
 [Source](https://github.com/python/cpython/blob/master/Objects/dictobject.c)
 [Implementers Notes](https://github.com/python/cpython/blob/master/Objects/dictnotes.txt)
 
-**Scheme:** Open Addressing with custom sequence. The sequence is essentially `j = ((5*j) + 1) mod TABLE_SIZE` but during the first few locations searched, the original hash code is progressively shifted and mixed in to increase key entropy. Not including the perturbation shift, this scheme expands to $$ \sum\_{n=0}^{i} 5^i \mod T $$
+**Scheme:** Open Addressing with custom sequence. The sequence is
 
-**Growth rate:** At least 2x, and size is always a power of 2. In the case where there a no deletions, it will double in size. Since deletions are tombstoned, it's possible that we have no usable space even though the we haven't hit the load factor. The growth rate is `used*2+capacity/2` to account for this.[^3]
+```c
+next = ((5*prev) + 1 + perturb) % TABLE_SIZE
+```
 
-**Load factor:** 2/3
+`perturb` is initially the hash code. For each successive element in the chain, `perturb = perturb >> 5`. If perturb started at 2^32, it would impact the first 7 items in the chain. This is interesting because it's neither linear nor quadratic probing, the two schemes everyone learns in school.
+
+**Growth rate:** At least 2x, and size is always a power of 2. In the case where there are no deletions, it will double in size. Since deletions are tombstoned (see above for explanation of tombstoning), it's possible that we have very long chains without hitting the load factor. The growth rate is `NUM_ITEMS*2+capacity/2`.[^3] By taking the size of the hash table into account, it ensures that the hash map will always grow when a resize is triggered.
+
+**Load factor:** 0.66
 
 Other bits of note:
 
  - Although Ruby uses a different perturbation strategy, they both use the same underlying probing scheme of `next = (prev * 5) + 1 mod TABLE_SIZE)`
- - The implementation special cases maps where the codes are exclusively unicode strings[^2]. The motivation for this comes from the fact that so many of the Python internals rely on dictionaries with unicode keys (eg. looking up local variables).[^5]
-   - With only string keys, a separate key array, `ma_keys` is stored along with `ma_values`
-   - With non string keys: `ma_values` is null and objects within `ma_keys` contain a pointer to `me_value`
- - Designed to work with badly behaved hash code functions because for integers in Python `hash(i) == i`
+ - The implementation special cases maps where the keys are exclusively unicode strings[^2]. The motivation for this comes from the fact that so many of the Python internals rely on dictionaries with unicode keys (eg. looking up local variables).[^5]
+   - With only string keys, keys are stored into an array directly and pointers to the values are stored in a separate array. This enables a few optimizations and means a pointer dereference isn't necessary when reading the keys.
+   - With non string keys, the key values pairs are stored together within a struct and these structs are in a single array.
+ - Designed to work with badly behaved hash code functions because for integers in Python `hash(i) == i`. A lot of care and tuning went into the perturbation strategy.
  - Tuned empirically with lots of magic numbers[^4]
- - Items that are removed must be tombstoned (marked `IDEX_DUMMY`). In open addressing that is the only way to signal that you need to look further down the chain if items have been deleted. Python uses a separate array mapping containing indices into the array of key-value pairs. This allows them to dodge a complexity in the Ruby hash table where they must ["escape"](https://github.com/ruby/ruby/blob/trunk/st.c#L310-L312) user provided hash codes that happen to collide with the chosen `DUMMY` constant.
  - The growth rate changed from `used*4` to `used*2` in `3.3.0`.[^3]
 
 ## Ruby
 [Source](https://github.com/ruby/ruby/blob/trunk/st.c) [Implementers Notes](https://github.com/ruby/ruby/blob/trunk/st.c#L1-L96)
 
-**Scheme:** Open addressing using `j = ((5*j) + 1) mod TABLE_SIZE` with perturbation. This is the same general structure as Python but they use a different perturbation strategy.
+**Scheme:** Open addressing using `j = ((5*j) + 1 + perturb) mod TABLE_SIZE`. This is the same general structure as Python but they use a slightly different perturbation strategy.
 
 **Growth rate:** 2x. The number of slots is always a power of 2.
 
-**Load factor:** .5
+**Load factor:** 0.5
 
 Other bits of note:
 
 - Old implementation used chaining. New implementation is reportedly 40% (!) faster[^1]
 - Entries array (for fast iteration) is split from bins array for hash lookup
 - Very small arrays have no bins and use linear scanning instead.
+- Ruby experimented with quadratic programming (in fact you can turn it on while compiling with `#define QUADRATIC_PROBE`), but it was slower in practice.[^7]
 
 ## Java
 
@@ -69,8 +86,11 @@ Other bits of note:
 
 Other bits of note:
 
-- Like Python, Java does some spreading to ameliorate the fact that it only reads the low bits when the hashtable is small:
-  `return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);`
+- Since Java hash tables are always power-of-2 sized, when you take the `hash_code % tablesize`, you will always drop some higher order bits until your hash table is `2^32`. To account for this, Java xors the hash code with itself, right shifted by 16. This ensures that the high order bits have some impact.
+```
+int h = key.hashCode();
+h = h ^ h >>> 16;
+```
 - When resizing, elements go in one of two buckets, `k` or `k+oldSize`. This is a
   convenience of factor-of-two resizing.
 - The code is really hard to follow, primarily due to the fact that chains can flip between trees and linked lists.
@@ -116,7 +136,7 @@ Bits of note:
 ## Golang
 [Source](https://github.com/golang/go/blob/master/src/runtime/hashmap.go)
 
-**Scheme:** Chaining, with some optimizations. The chains are composed of buckets. Each bucket has 8 slots. Once all 8 slots are consumed, an overflow bucket is chained to the first bucket. Storing 8 key-value pairs in contiguous reduces the amount of memory accesses and memory allocations when reading and writing to the map.
+**Scheme:** Chaining, with some optimizations. The chains are composed of buckets. Each bucket has 8 slots. Once all 8 slots are consumed, an overflow bucket is chained to the first bucket. Storing 8 key-value pairs in contiguous memory reduces the amount of memory accesses and memory allocations when reading and writing to the map.
 
 **Growth Rate:** 2x. When a lot of deletions occur, a map of the same size is allocated to garbage collect the unused buckets.
 
@@ -135,29 +155,34 @@ Bits of note:
     In the case of #2, the newly allocated array is the same size as the old array. This seeming nonsensical behavior comes from this [commit](https://github.com/golang/go/commit/9980b70cb460f27907a003674ab1b9bea24a847c). In the case of deletions, allocating and slowly migrating to a new array means that we'll garbage collect the old buckets instead of slowly leaking them. They chose this approach to ensure that iterators continued to work properly.
 
 ## C\#
-[Source](https://github.com/dotnet/coreclr/blob/master/src/mscorlib/src/System/Collections/Hashtable.cs)
-[Implementers Notes](https://github.com/dotnet/coreclr/blob/master/src/mscorlib/src/System/Collections/Hashtable.cs#L71-L124)
+[Source](https://github.com/dotnet/coreclr/blob/master/src/mscorlib/shared/System/Collections/Generic/Dictionary.cs)
 
-**Scheme:** Open addressing with [double hashing](https://en.wikipedia.org/wiki/Double_hashing):
-
-```          
-double_hash(key, n) = h1(key) + n*h2(key)
-h1(key) = GetHash(key);  // default implementation calls key.GetHashCode();
-h2(key) = 1 + (((h1(key) >> 5) + 1) % (hashsize - 1));
-```
+**Scheme:** Chaining
 
 **Growth Rate:** >2x. The new size is the smallest prime number greater than 2x the old size.
 
-**Load Factor:** 0.72
+**Load Factor:** 1
 
 Bits of note:
 
-- For reasons not clear to me, the actual load factor used by the hash table is 0.72x the load factor that you asked for.
-- Unlike most other implementations, the c# implementation takes care to ensure that
-  concurrent readers don't view invalid data during a resize.
+- Although it uses chaining, it does it in a clever way. The hashtable stores 2 arrays:
+  1. An array of ints that are indices into the entries array (array #2). When looking up some key `k` in the table, we take its hash code mod the length of this array and look at that index in array #1.
+  2. An array of `Entries`: each entry stores a key, a value, and the index of another entry in the same array.
+      ```c#
+      private struct Entry
+      {
+          public TKey key;        // Key of entry
+          public TValue value;    // Value of entry
+          public int next;        // Index of next entry, -1 if last
+                                  // (or only) item in chain
+      }
+      ```
+
+  The clever bit here, is that when we need to chain items together we don't need to allocate linked lists nodes -- they're already preallocated. Furthermore, they're already in one block of contiguous memory which improves cache locality.
+
 
 ## C++ (GCC STL)
-[Source](https://github.com/gcc-mirror/gcc/blob/master/gcc/hash-table.h)
+[Source](https://github.com/gcc-mirror/gcc/blob/master/gcc/hash-table.h)[^6]
 
 **Scheme:** Open addressing with [double hashing](https://en.wikipedia.org/wiki/Double_hashing).
 ```
@@ -175,7 +200,7 @@ Bits of note:
 
 - Similar to C# in growth behavior
 - Table size is always prime. This surprised me since I figured c++ would try to align on powers of 2 to help out malloc.
-- Load factor hard coded and not configurable
+- Load factor is hard coded and not configurable
 
 ### Wrap Up
 
@@ -189,3 +214,5 @@ Did I miss your favorite language? Let me know in the comments or by email, `*+h
 [^3]: https://github.com/python/cpython/blob/60c3d35/Objects/dictobject.c#L398-L408
 [^4]: https://github.com/python/cpython/blob/master/Objects/dictnotes.txt#L70
 [^5]: Perhaps surprisingly, starting the Python interpreter and running a couple of non-dictionary related commands incurs about 100 dictionary lookups.
+[^6]: [hashtable.h](https://github.com/gcc-mirror/gcc/blob/master/gcc/hash-table.h) in included via [unordered_map](https://github.com/gcc-mirror/gcc/blob/master/libstdc++-v3/include/tr1/unordered_map#L41) and is what implements [unordered_map.h](https://github.com/gcc-mirror/gcc/blob/master/libstdc%2B%2B-v3/include/tr1/unordered_map.h)
+[^7]: https://github.com/ruby/ruby/blob/fc939f6/st.c#L842-L845FF
