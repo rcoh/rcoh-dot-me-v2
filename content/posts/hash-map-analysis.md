@@ -182,25 +182,24 @@ Bits of note:
 
 
 ## C++ (GCC STL)
-[Source](https://github.com/gcc-mirror/gcc/blob/master/gcc/hash-table.h)[^6]
 
-**Scheme:** Open addressing with [double hashing](https://en.wikipedia.org/wiki/Double_hashing).
-```
-// TABLE_SIZE is always prime
-double_hash(key, n) = h1(key) + n*h2(key)
-h1(key) = INPUT_HASH % TABLE_SIZE
-h2(key) = 1 + INPUT_HASH % (TABLE_SIZE-2)
-```
+*I originally got this totally wrong and was looking at the wrong source. Thanks to reddit user [u/raevnos](https://www.reddit.com/user/raevnos) for setting me straight.*
+
+[Source](https://github.com/gcc-mirror/gcc/blob/846deaf01bfe46e0db44402858ab1b7ee43f4023/libstdc++-v3/include/std/unordered_map) which `#includes` [the actual source](https://github.com/gcc-mirror/gcc/blob/master/libstdc%2B%2B-v3/include/bits/hashtable.h)
+
+
+**Scheme:** Chaining
 
 **Growth Rate:** >2x. The new size is the smallest prime number greater than 2x the old size.
 
-**Load Factor:** 0.5
+**Load Factor:** 1
 
 Bits of note:
 
+- There is no one implementation of the C++ standard, however, the standard seemingly mandates chaining, as explained in this [stack overflow answer](https://stackoverflow.com/questions/31112852/how-stdunordered-map-is-implemented). The proposal for [adding hash maps to the spec](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2003/n1456.html) rules out open addressing as a straightforward way to implement hash tables as a c++ template.
 - Similar to C# in growth behavior
-- Table size is always prime. This surprised me since I figured c++ would try to align on powers of 2 to help out malloc.
-- Load factor is hard coded and not configurable
+- Table size is always prime.[^6] This surprised me since I figured c++ would try to align on powers of 2 to help out malloc.
+- C++ templates are very hard to follow ;-)
 
 ### Wrap Up
 
@@ -214,5 +213,5 @@ Did I miss your favorite language? Let me know in the comments or by email, `*+h
 [^3]: https://github.com/python/cpython/blob/60c3d35/Objects/dictobject.c#L398-L408
 [^4]: https://github.com/python/cpython/blob/master/Objects/dictnotes.txt#L70
 [^5]: Perhaps surprisingly, starting the Python interpreter and running a couple of non-dictionary related commands incurs about 100 dictionary lookups.
-[^6]: [hashtable.h](https://github.com/gcc-mirror/gcc/blob/master/gcc/hash-table.h) in included via [unordered_map](https://github.com/gcc-mirror/gcc/blob/master/libstdc++-v3/include/tr1/unordered_map#L41) and is what implements [unordered_map.h](https://github.com/gcc-mirror/gcc/blob/master/libstdc%2B%2B-v3/include/tr1/unordered_map.h)
 [^7]: https://github.com/ruby/ruby/blob/fc939f6/st.c#L842-L845FF
+[^6]: https://github.com/gcc-mirror/gcc/blob/master/libstdc%2B%2B-v3/include/bits/unordered_map.h#L53
