@@ -157,7 +157,7 @@ Bits of note:
 ## C\#
 [Source](https://github.com/dotnet/coreclr/blob/master/src/mscorlib/shared/System/Collections/Generic/Dictionary.cs)
 
-**Scheme:** Chaining via [Chained Scatter Table](http://book.huihoo.com/data-structures-and-algorithms-with-object-oriented-design-patterns-in-c++/html/page230.html#fighash2)
+**Scheme:** Chaining
 
 **Growth Rate:** >2x. The new size is the smallest prime number greater than 2x the old size.
 
@@ -168,6 +168,7 @@ Bits of note:
 - Although it uses chaining, it does it in a clever way. The hash table stores 2 arrays:
   1. An array of ints that are indices into the entries array (array #2). When looking up some key `k` in the table, we take its hash code mod the length of this array and look at that index in array #1.
   2. An array of `Entries`: each entry stores a key, a value, and the index of another entry in the same array.
+
       ```c#
       private struct Entry
       {
@@ -178,8 +179,7 @@ Bits of note:
       }
       ```
 
-  The clever bit here, is that when we need to chain items together we don't need to allocate linked-list nodes -- they're already preallocated. Furthermore, they're already in one block of contiguous memory which improves cache locality. It's not without downsides, however. It's possible
-  for two lists to `coalesce` where the end of one list serves as the starting point for another. When searching for absent keys, this can lead to increased search time.
+  The clever bit here, is that when we need to chain items together we don't need to allocate linked-list nodes -- they're already preallocated. Furthermore, they're already in one block of contiguous memory which improves cache locality.
 
 ## C++ (GCC STL)
 
