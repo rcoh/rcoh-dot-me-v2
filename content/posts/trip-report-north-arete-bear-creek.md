@@ -2,8 +2,9 @@
 title: "Trip Report: North Arete Bear Creek Spire"
 date: 2016-08-29T22:53:41-05:00
 draft: false
+tags: ["trip-reports"]
 ---
-After 4 days climbing long moderates in Tuolumne Meadows, Eben and I were stoked to get out of the park for the weekend and escape the crowds on some eastside alpine rock. 
+After 4 days climbing long moderates in Tuolumne Meadows, Eben and I were stoked to get out of the park for the weekend and escape the crowds on some eastside alpine rock.
 
 [![IMG_20160824_192623.jpg](https://svbtleusercontent.com/tvgkmshb2y5xa_small.jpg)](https://svbtleusercontent.com/tvgkmshb2y5xa.jpg)
 
@@ -45,7 +46,7 @@ After that pitch established us on the arete we were in for 4 pitches of 4th and
 
 [![IMG_20160828_124439.jpg](https://svbtleusercontent.com/malufajegqypw_small.jpg)](https://svbtleusercontent.com/malufajegqypw.jpg)
 
-By 1:00pm, two blocks of simul climbing later, we were on the summit. Getting onto the summit block was advertised as requiring a "5.6R mantle." I led the final micro pitchette onto the summit block and didn't find it too scary. A beta note for future parties: a .1, .2 and .4 X4s make a nice anchor on the summit to bring up your partner. 
+By 1:00pm, two blocks of simul climbing later, we were on the summit. Getting onto the summit block was advertised as requiring a "5.6R mantle." I led the final micro pitchette onto the summit block and didn't find it too scary. A beta note for future parties: a .1, .2 and .4 X4s make a nice anchor on the summit to bring up your partner.
 
 [![IMG_20160828_130835704.jpg](https://svbtleusercontent.com/sglvti0frjdqq_small.jpg)](https://svbtleusercontent.com/sglvti0frjdqq.jpg)
 
@@ -65,5 +66,3 @@ Since it had only taken us 5 hours to climb the 10 pitches, we had plenty of tim
 [![IMG_20160828_174921.jpg](https://svbtleusercontent.com/zmqiusj3hg58g_small.jpg)](https://svbtleusercontent.com/zmqiusj3hg58g.jpg)
 
 But by 6pm, we emerged from the wilderness, already talking about our next alpine objective.
-
-

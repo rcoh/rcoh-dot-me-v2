@@ -17,7 +17,7 @@ pygmentsCodeFences = true
   filename = "sitemap.xml"
 
 [params]
-  mainSections = ["posts"]
+  mainSections = ["post"]
   favicon = ""
   source = "https://github.com/rcoh/rcoh-dot-me-v2"
   description = "Russell Cohen's Blog and Website"

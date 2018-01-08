@@ -2,6 +2,7 @@
 title: "No Magic: Regular Expressions, Part 3"
 date: 2016-12-30T11:47:18-05:00
 draft: false
+tags: ["no-magic", "scala"]
 ---
 The code for this post, as well as the post itself, are on [github](https://github.com/rcoh/toyregex).
 
@@ -20,60 +21,60 @@ Evaluating a DFA is straightforward: simply move through the states by consuming
 
 [![dfavsnfa.png](https://svbtleusercontent.com/jgl025kfustnta_small.png)](https://svbtleusercontent.com/jgl025kfustnta.png)
 
-Note that there are multiple unlabeled edges that we can follow without consuming a character. How can we track that efficiently? The answer is surprisingly simple: instead of tracking only one possible state, keep a list of states that the engine is currently in. When you encounter a fork, take both paths (turning one state into two). When a state lacks a valid transition for the current input, remove it from the list. 
+Note that there are multiple unlabeled edges that we can follow without consuming a character. How can we track that efficiently? The answer is surprisingly simple: instead of tracking only one possible state, keep a list of states that the engine is currently in. When you encounter a fork, take both paths (turning one state into two). When a state lacks a valid transition for the current input, remove it from the list.
 
 There are 2 subtleties we have to consider: avoiding infinite loops in the graph and handling no-input-transitions properly. When we are evaluating a given state, we first advance all the states to enumerate all the possible states reachable from our current state if we don't consume any more input. This is the phase that also requires care to maintain a "visited set" to avoid infinitely looping in our graph. Once we have enumerated those states, we consume the next token of input, either advancing those states or removing them from our set.
 
 ```scala
     object NFAEvaluator {
-        def evaluate(nfa: State, input: String): Boolean = 
+        def evaluate(nfa: State, input: String): Boolean =
             evaluate(Set(nfa), input)
 
         def evaluate(nfas: Set[State], input: String): Boolean = {
             input match {
-                case "" => 
+                case "" =>
                     evaluateStates(nfas, None).exists(_ == Match())
-                case string => 
+                case string =>
                     evaluate(
-                        evaluateStates(nfas, input.headOption), 
+                        evaluateStates(nfas, input.headOption),
                         string.tail
                     )
             }
         }
 
-        def evaluateStates(nfas: Set[State], 
+        def evaluateStates(nfas: Set[State],
                            input: Option[Char]): Set[State] = {
             val visitedStates = mutable.Set[State]()
-            nfas.flatMap { state => 
+            nfas.flatMap { state =>
                 evaluateState(state, input, visitedStates)
             }
         }
 
         def evaluateState(currentState: State, input: Option[Char],
             visitedStates: mutable.Set[State]): Set[State] = {
-            
+
             if (visitedStates contains currentState) {
                 Set()
             } else {
                 visitedStates.add(currentState)
                 currentState match {
-                    case placeholder: Placeholder => 
+                    case placeholder: Placeholder =>
                         evaluateState(
-                            placeholder.pointingTo, 
+                            placeholder.pointingTo,
                             input,
                             visitedStates
                         )
-                    case consume: Consume => 
-                        if (Some(consume.c) == input 
-                            || consume.c == '.') { 
-                            Set(consume.out) 
-                        } else { 
+                    case consume: Consume =>
+                        if (Some(consume.c) == input
+                            || consume.c == '.') {
+                            Set(consume.out)
+                        } else {
                             Set()
                         }
-                    case s: Split => 
-                        evaluateState(s.out1, input, visitedStates) ++ 
+                    case s: Split =>
+                        evaluateState(s.out1, input, visitedStates) ++
                         evaluateState(s.out2, input, visitedStates)
-                    case m: Match => 
+                    case m: Match =>
                         if (input.isDefined) Set() else Set(Match())
                 }
             }
@@ -97,7 +98,7 @@ We've finished all the important code, but the API isn't as clean as we'd like. 
             NFAEvaluator.evaluate(nfa, input)
         }    
 
-        def matchAnywhere(input: String, pattern: String) = 
+        def matchAnywhere(input: String, pattern: String) =
             fullMatch(input, ".*" + pattern + ".*")
     }
 ```
@@ -119,4 +120,3 @@ That's all there is to it. A semi-functional regex implementation in just 106 li
 5. Any many more.
 
 I hope this simple implementation helps you understand what's going on under the hood! It's worth mentioning that the performance of this evaluator is heinous. Truly terrible. Perhaps in a future post I'll look into why and talk about ways to optimize it...
-

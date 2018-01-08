@@ -2,6 +2,7 @@
 title: "No Magic: Regular Expressions, Part 2"
 date: 2016-12-30T11:41:35-05:00
 draft: false
+tags: ["no-magic"]
 ---
 The code for this post, as well as the post itself, are on [github](https://github.com/rcoh/toyregex).
 
@@ -14,7 +15,7 @@ This post is part 2 of a 3 part series.
 
 In the last post, we transformed the flat string representation of a regular expression to the hierarchical parse tree form. In this post we'll transform the parse tree to a state machine. The state machine linearizes the regex components into a graph, producing an "a follows b follows c" relationship. The graph representation will make it easier to evaluate against a potential string.
 
-*Why make yet another transformation just to match a regex?* 
+*Why make yet another transformation just to match a regex?*
 
 It would certainly be possible to translate directly from a string to a state machine. You could even attempt to evaluate the regex directly from the parse tree or the string. Doing this, however, would likely involve significantly more complicated code. By slowly lowering the level of abstraction, we can ensure that the code at each stage is easy to understand and reason about. This is especially important when building something like a regular expression evaluator with literally infinite edge cases.
 
@@ -40,7 +41,7 @@ Let's lay out a strategy for transforming our parse tree info an NFA. While it m
 
 
 The transformations that follow were initially outlined by Thompson in his 1968 paper. In the transformation diagrams, `In` will refer the to the entry point of the state machine and `Out` will refer to the exit. In practice those can be the "Match" state, the "Start" state, or other regex components. The `In` / `Out` abstraction allows us to compose and combine state machines, a key insight. For example, if we have a state machine that matches "abc" and another that matches "cde", connecting them sequentially will yield a state machine that matches "abccde". We'll apply this principle more generally to transform from each element in our syntax tree into a composable state machine.
- 
+
 Let's start with character literals. A character literal is a transition from one state to another that consumes input. Consuming the literal 'a' would look like this:
 
 [![lit.dot.png](https://svbtleusercontent.com/rwoluadeoefga_small.png)](https://svbtleusercontent.com/rwoluadeoefga.png)
@@ -64,7 +65,7 @@ For `+`, we'll use a little trick. `a+` is just `aa*`. Generalizing, `Plus(A)` c
 Now that we've made a theoretical plan, lets dive in to how we'll actually code it. We'll be creating a mutable graph to store our tree. While I'd prefer immutability, making immutable graphs is annoyingly difficult, and I'm lazy.
 
 If we were to try to boil the above diagrams into core components, we'd end up with three types of components: arrows that consume input, the match state, and one state splitting into two states. I know this seems a little odd, and potentially incomplete. You'll have to trust me that this choice leads to the cleanest code. Here are our 3 NFA component classes:
-    
+
 ```scala
 abstract class State
 
@@ -73,7 +74,7 @@ class Split(val out1: State, val out2: State) extends State
 case class Match() extends State
 ```
 
-*Aside: I made `Match` a [`case class`](http://stackoverflow.com/questions/2312881/what-is-the-difference-between-scalas-case-class-and-class) instead of a regular class. Case classes in Scala bring certain sensible defaults to your class. I used it because it gives value based equality. This makes all `Match` objects equal, a useful property. For the other types of NFA components, we want reference equality.* 
+*Aside: I made `Match` a [`case class`](http://stackoverflow.com/questions/2312881/what-is-the-difference-between-scalas-case-class-and-class) instead of a regular class. Case classes in Scala bring certain sensible defaults to your class. I used it because it gives value based equality. This makes all `Match` objects equal, a useful property. For the other types of NFA components, we want reference equality.*
 
 Our code will recursively traverse our syntax tree, keeping an `andThen` object as a parameter. `andThen` is the what we will attach to the free hanging outputs of our expression. This is required because from an aribtrary branch in your syntax tree, you lack the context of what comes next -- `andThen` allows us pass that context down as we recurse. It also gives us an easy way to append the `Match` state.
 
@@ -85,14 +86,14 @@ class Placeholder(var pointingTo: State) extends State
 
 The `var` in `Placeholder` means the `pointingTo` is mutable. It is the isolated bit of mutability allowing us easily create a cyclical graph. All the other members are immutable.
 
-To start things off, `andThen` is `Match()` -- this means that we'll create a state machine matching our Regex which can then transfer to the `Match` state without consuming anymore input. The code is short but dense: 
+To start things off, `andThen` is `Match()` -- this means that we'll create a state machine matching our Regex which can then transfer to the `Match` state without consuming anymore input. The code is short but dense:
 
 ```scala
     object NFA {
-        def regexToNFA(regex: RegexExpr): State = 
+        def regexToNFA(regex: RegexExpr): State =
             regexToNFA(regex, Match())
-        
-        private def regexToNFA(regex: RegexExpr, 
+
+        private def regexToNFA(regex: RegexExpr,
                                andThen: State): State = {        
             regex match {
                 case Literal(c) => new Consume(c, andThen)
@@ -102,14 +103,14 @@ To start things off, `andThen` is `Match()` -- this means that we'll create a st
                     regexToNFA(first, regexToNFA(second, andThen))
                 }
                 case Or(l, r) => new Split(
-                    regexToNFA(l, andThen), 
+                    regexToNFA(l, andThen),
                     regexToNFA(r, andThen)
                 )
 
-                case Repeat(r) => 
+                case Repeat(r) =>
                     val placeholder = new Placeholder(null)
                     val split = new Split(
-                        // One path goes to the placeholder, 
+                        // One path goes to the placeholder,
                         // the other path goes back to r
                         regexToNFA(r, placeholder),
                         andThen
@@ -117,7 +118,7 @@ To start things off, `andThen` is `Match()` -- this means that we'll create a st
                     placeholder.pointingTo = split
                     placeholder
 
-                case Plus(r) => 
+                case Plus(r) =>
                     regexToNFA(Concat(r, Repeat(r)), andThen)    
             }
         }
@@ -141,4 +142,3 @@ In the debugging process, I wrote a quick script to generate `dot` files from NF
 [![aorb.dot.png](https://svbtleusercontent.com/mfdc04hix1g8kg_small.png)](https://svbtleusercontent.com/mfdc04hix1g8kg.png)
 
 Now that we have an NFA (the hard part) all we have to do is evaluate it (the easier part). [Part 3](https://rcoh.svbtle.com/no-magic-regular-expressions-part-3), focusing on evaluating an NFA, concludes this series.
-

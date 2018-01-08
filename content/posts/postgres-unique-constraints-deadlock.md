@@ -2,13 +2,14 @@
 title: "How Postgres Unique Constraints Can Cause Deadlock"
 date: 2017-12-29T22:49:36-05:00
 draft: false
+tags: ["postgres", "databases", "devops"]
 ---
 
 
 
 A recent outage lead me to investigate Postgres unique constraints more deeply. Postgres implements unique constraints by creating a unique index -- an index that can only contain unique values.[^4] It turns out that unique indices and concurrent transactions can interact in nasty and surprising ways. Before I get into the "why", here are the implications:
 
-**When two transactions insert the same value into a unique index, one transaction will wait for the other transaction to finish before proceeding. Moreover, you can cause deadlock using only `inserts`.** 
+**When two transactions insert the same value into a unique index, one transaction will wait for the other transaction to finish before proceeding. Moreover, you can cause deadlock using only `inserts`.**
 
 This means:
 
@@ -34,11 +35,11 @@ If two transactions are writing to the index concurrently, the situation is more
 
 Both transactions attempt to insert value `v` into the same table. Suppose `transaction a` has inserted `v` first but has not yet committed.
 
-`transaction b` inserts `v` which causes Postgres to check the unique index. A Postgres index stores not only committed data, but also stores data written by ongoing transactions. Postgres will look for the tuple we're attempting to insert in both the committed and "dirty" (not-yet-committed) sections of the index. In this case, it will find that another in-progress transaction (`transaction a`) has already inserted `v`. 
+`transaction b` inserts `v` which causes Postgres to check the unique index. A Postgres index stores not only committed data, but also stores data written by ongoing transactions. Postgres will look for the tuple we're attempting to insert in both the committed and "dirty" (not-yet-committed) sections of the index. In this case, it will find that another in-progress transaction (`transaction a`) has already inserted `v`.
 
-Postgres handles this situation by having `transaction b` wait until `transaction a` completes. Every transaction holds an exclusive lock on its own transaction ID while the transaction is in progress. If you want to wait for another transaction to finish, you can attempt to acquire a lock on that transaction ID, which will be granted when that transaction finishes.[^3] 
+Postgres handles this situation by having `transaction b` wait until `transaction a` completes. Every transaction holds an exclusive lock on its own transaction ID while the transaction is in progress. If you want to wait for another transaction to finish, you can attempt to acquire a lock on that transaction ID, which will be granted when that transaction finishes.[^3]
 
-In our example, Postgres will determine the transaction ID of the other transaction (`transaction a`) and `transaction b` will attempt to acquire a lock on the transaction ID of `transaction a`.[^2] 
+In our example, Postgres will determine the transaction ID of the other transaction (`transaction a`) and `transaction b` will attempt to acquire a lock on the transaction ID of `transaction a`.[^2]
 
 `transaction b` is now blocked waiting for `transaction a` to finish. There are 3 possible outcomes, ordered best to worst:
 
@@ -46,7 +47,7 @@ In our example, Postgres will determine the transaction ID of the other transact
 `transaction a` finishes promptly. `transaction b` fails with the message `duplicate key v violates unique constraint "..."`
 
 ### 2. Postgres detects deadlock
-If the two transactions are each inserting multiple rows into the table, `transaction a` may attempt to insert a key previously inserted by `transaction b`. This causes `transaction a` to attempt to acquire a lock on `transaction b`. Now `b` is waiting on `a` and `a` is waiting on `b`. Deadlock! Postgres detects this after `deadlock_timeout` and one of the transactions is aborted with this somewhat confusing deadlock error: 
+If the two transactions are each inserting multiple rows into the table, `transaction a` may attempt to insert a key previously inserted by `transaction b`. This causes `transaction a` to attempt to acquire a lock on `transaction b`. Now `b` is waiting on `a` and `a` is waiting on `b`. Deadlock! Postgres detects this after `deadlock_timeout` and one of the transactions is aborted with this somewhat confusing deadlock error:
 
 ```
 ERROR:  deadlock detected
@@ -67,6 +68,4 @@ Thanks to Leah Alpert for being unlucky enough to run into this in production, a
 [^2]: [Postgres source](https://github.com/postgres/postgres/blob/382ceff/src/backend/executor/execIndexing.c#L796) `xwait` is the transaction that is also attempting to insert the same value. It's not obvious to me why Postgres implements unique indices in this way. One could imagine an implementation that let both transactions continue and the second one to commit would fail. One possible explanation is that this prevents the database from doing wasted work.
 [^3]: From https://www.postgresql.org/docs/9.3/static/view-pg-locks.html: Every transaction holds an exclusive lock on its virtual transaction ID for its entire duration. If a permanent ID is assigned to the transaction (which normally happens only if the transaction changes the state of the database), it also holds an exclusive lock on its permanent transaction ID until it ends. When one transaction finds it necessary to wait specifically for another transaction, it does so by attempting to acquire share lock on the other transaction ID (either virtual or permanent ID depending on the situation). That will succeed only when the other transaction terminates and releases its locks.
 [^4]: https://www.postgresql.org/docs/9.4/static/indexes-unique.html
-[^5]: https://www.postgresql.org/docs/9.1/static/explicit-locking.html: PostgreSQL automatically detects deadlock situations and resolves them by aborting one of the transactions involved, allowing the other(s) to complete. (Exactly which transaction will be aborted is difficult to predict and should not be relied upon.) 
-
-
+[^5]: https://www.postgresql.org/docs/9.1/static/explicit-locking.html: PostgreSQL automatically detects deadlock situations and resolves them by aborting one of the transactions involved, allowing the other(s) to complete. (Exactly which transaction will be aborted is difficult to predict and should not be relied upon.)

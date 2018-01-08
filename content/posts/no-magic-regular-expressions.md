@@ -2,6 +2,7 @@
 title: "No Magic: Regular Expressions"
 date: 2016-12-29T23:38:13-05:00
 draft: false
+tags: ["no-magic", "scala"]
 ---
 The code for this post, as well as the post itself, are on [github](https://github.com/rcoh/toyregex).
 
@@ -15,12 +16,12 @@ Until recently, regular expressions seemed magical to me. I never understood how
 Implementing full regular expressions is rather cumbersome, and worse, doesn't teach you much. The version we'll implement is just enough to learn without being tedious. Our regular expression language will support:
 
 * `.`: Match any character
-* ``|``: Match ``abc`` or ``cde`` 
+* ``|``: Match ``abc`` or ``cde``
 * ``+``: Match one or more of the previous pattern
 * ``*``: Match 0 or more of the previous pattern
 * ``(`` and ``)`` for grouping
 
-While this is a small set of options, we'll still be able to make some cute regexes, like [``m (t|n| ) | b``](http://xkcd.com/1313/) to match Star Wars subtitles without matching Star Trek ones, or ``(..)*`` the set of all even length strings. 
+While this is a small set of options, we'll still be able to make some cute regexes, like [``m (t|n| ) | b``](http://xkcd.com/1313/) to match Star Wars subtitles without matching Star Trek ones, or ``(..)*`` the set of all even length strings.
 
 ## The Plan of Attack ##
 
@@ -61,9 +62,9 @@ case class Concat(first: RegexExpr, second: RegexExpr) extends RegexExpr
 
 // a*
 case class Repeat(expr: RegexExpr) extends RegexExpr
-    
+
 // a+
-case class Plus(expr: RegexExpr) extends RegexExpr 
+case class Plus(expr: RegexExpr) extends RegexExpr
 ```
 
 ## Parsing a Regular Expression
@@ -72,16 +73,16 @@ To get from a string to a tree representation, we'll use conversion process know
 
 Scala's parser library will let us write a parser by just writing the set of [rules that describe our language](http://en.wikipedia.org/wiki/Formal_grammar). It uses a lot of obtuse symbols unfortunately, but I hope you'll be able to look through the noise to see the gist of what's happening.
 
-When implementing a parser we need to consider order of operations. Just as "PEMDAS" applies to arithmetic, a different set of rules apply to regular expressions. We can express this more formally with the idea of an operator "binding" to the characters near it. Different operators "bind" with different strengths -- as an analogy, `*` binds more tightly than `+` in expressions like 5+6*4. In regular expressions, `*` binds more tightly than `|`. If we were to represent parsing this as a tree the weakest operators end up on top. 
- 
+When implementing a parser we need to consider order of operations. Just as "PEMDAS" applies to arithmetic, a different set of rules apply to regular expressions. We can express this more formally with the idea of an operator "binding" to the characters near it. Different operators "bind" with different strengths -- as an analogy, `*` binds more tightly than `+` in expressions like 5+6*4. In regular expressions, `*` binds more tightly than `|`. If we were to represent parsing this as a tree the weakest operators end up on top.
+
 [![multex.png](https://svbtleusercontent.com/sstquqt5mol21w_small.png)](https://svbtleusercontent.com/sstquqt5mol21w.png)
 
-It follows that we should parse the weakest operators first, followed by the stronger operators. When parsing, you can imagine it as extracting an operator, adding it to the tree, then recursing on the remaining 2 parts of the string. 
+It follows that we should parse the weakest operators first, followed by the stronger operators. When parsing, you can imagine it as extracting an operator, adding it to the tree, then recursing on the remaining 2 parts of the string.
 
 In regular expressions the order of binding strength is:
 
 1. Character Literal & parentheses
-2. `+` and `*` 
+2. `+` and `*`
 3. "Concatenation" -- a is after b
 4. `|`
 
@@ -89,8 +90,8 @@ Since we have 4 levels of binding strength, we need 4 different types of express
 
 ```scala
 object RegexParser extends RegexParsers {
-	def charLit: Parser[RegexExpr] = ("""\w""".r | ".") ^^ { 
-	    char => Literal(char.head) 
+	def charLit: Parser[RegexExpr] = ("""\w""".r | ".") ^^ {
+	    char => Literal(char.head)
 	}
 ```
 
@@ -106,9 +107,9 @@ Parentheses must be defined at the lowest level of the parser since they are the
 Here, we'll define ``*`` and ``+``:
 
 ```scala
-        def repeat: Parser[RegexExpr] = lit <~ "*" 
-            ^^ { case l => Repeat(l) } 
-        def plus: Parser[RegexExpr] = lit <~ "+" 
+        def repeat: Parser[RegexExpr] = lit <~ "*"
+            ^^ { case l => Repeat(l) }
+        def plus: Parser[RegexExpr] = lit <~ "+"
             ^^ { case p => Plus(p) }
         def lowExpr: Parser[RegexExpr] = repeat | plus | lit
 ```
@@ -116,7 +117,7 @@ Here, we'll define ``*`` and ``+``:
 Next, we'll define concatenation, the next level up:
 
 ```scala
-        def concat: Parser[RegexExpr] = rep(lowExpr) 
+        def concat: Parser[RegexExpr] = rep(lowExpr)
             ^^ { case list => listToConcat(list)}
         def midExpr: Parser[RegexExpr] = concat | lowExpr
 ```
@@ -124,7 +125,7 @@ Next, we'll define concatenation, the next level up:
 Finally, we'll define or:
 
 ```scala
-        def or: Parser[RegexExpr] = midExpr ~ "|" ~ midExpr 
+        def or: Parser[RegexExpr] = midExpr ~ "|" ~ midExpr
             ^^ { case l ~ "|" ~ r => Or(l, r)}
 ```
 
@@ -151,7 +152,6 @@ Finally, a touch of helper code to finish it off:
 }
 ```
 
-That's it! If you take this Scala code you'll be able to generate parse trees for any regular expression that meets the spec. The resulting data structures will be trees. 
+That's it! If you take this Scala code you'll be able to generate parse trees for any regular expression that meets the spec. The resulting data structures will be trees.
 
 Now that we can convert our regular expressions into syntax trees, we're well underway to being able to evaluate them. I wrote about the next steps [in part 2](http://rcoh.svbtle.com/regular-expressions-part-2). As always, the [code](https://www.github.com/rcoh/toyregex) is on Github.
-

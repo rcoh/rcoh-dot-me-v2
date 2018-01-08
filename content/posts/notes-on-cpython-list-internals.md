@@ -2,6 +2,7 @@
 title: "Notes on CPython List Internals"
 date: 2017-12-29T13:02:41-05:00
 draft: false
+tags: ["language-internals", "python"]
 ---
 As I was learning to program, Python lists seemed totally magical to me. I imagined them as being implemented by some sort of magical datastructure that was part linked-list, part array that was perfect for everything.
 
