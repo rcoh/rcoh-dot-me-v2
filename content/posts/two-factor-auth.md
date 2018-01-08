@@ -10,7 +10,7 @@ a bit magical. A few days ago, my curiosity found itself coupled with some free 
 I scanned the QR code from Github with a barcode scanning app. Here's what's inside:
 
 ```
-otpauth://totp/Github:rcoh?secret=njqwezdbmu2dgylb&issuer=Github
+otpauth://totp/Github:rcoh?secret=onswg4tforrw6zdf&issuer=Github
 ```
 
 Not too surprising. It tells us the protocol, [TOTP](https://tools.ietf.org/html/rfc6238), who is issuing this OTP code (Github), and most importantly the secret:[^3]
@@ -22,14 +22,23 @@ secret = 'onswg4tforrw6zdf'
 So how do we go from this to a time rotating 6-digit code?
 
 ### From Secret to 6-digit Code
-I followed the spec and was able to implement a [Python script](https://gist.github.com/rcoh/c4dc45825a322881a9c1b300d70c3941) that generated the same codes as Google Authenticator. I walk through the steps here:
+I followed the spec and was able to implement a [Python script](https://gist.github.com/rcoh/c4dc45825a322881a9c1b300d70c3941) that generated the same codes as Google Authenticator. Before we dive in, a quick overview:
+
+1. Figure out your `time_chunk` based on the current time.
+2. Generate an hmac that combines your `time_chunk` and your secret. Combining these with HMAC is a convenient way to prove that you have the     secret without revealing it. It's a sha1-hmac, which means we'll get a 20-byte digest.
+3. Converting the digest into a number has two steps:
+  1. Take the last 4-bits of the digest. These become the offset (back into the digest). Eg. if the last 4 bits are `0010`, then we would start at the 4th byte.
+  2. Read 4 bytes starting from the offset.
+4. Convert the 4 byte section into a *n* digit integer. This is your two-factor code.
+
+Here's how that works in practice:
 
 1. The algorithm works by finding what 30 second time slice we're in, starting from the Unix Epoch:
 
     ```python
     time_chunk = int(time.time() / 30)
 
-    # In order to feed this into the next step, we need the binary representation:
+    # To feed this into the next step, we need the binary representation.
     # Per the spec, the time is represented as an 8-byte string in
     # big endian. '>q' gets us a  big-endian unsigned long (8-bytes)
     time_bytes = struct.pack('>q', time_chunk)
@@ -78,16 +87,16 @@ I followed the spec and was able to implement a [Python script](https://gist.git
     ```
 
 ### Backup Codes
-It's not in the spec as far as I saw, but Google Authenticator style codes usually also include backup codes. The [Google implementation](https://github.com/google/google-authenticator-libpam/blob/master/src/google-authenticator.c) derives them by taking 4 byte sections of the secret and converting them into digits by the same process as the time-based system: `bignum % (10 ** d)`. This means they're also derivable in a predictable way from the original key so they don't need to by stored separately by the server. Some other systems use hex-based codes instead, but presumably it's a similar process.
+It's not in the spec as far as I saw, but Google Authenticator style codes usually also include backup codes. The [Google implementation](https://github.com/google/google-authenticator-libpam/blob/master/src/google-authenticator.c) derives them by taking 4-byte sections of the secret and converting them into digits by the same process as the time-based system: `bignum % (10 ** d)`. This means they're also derivable in a predictable way from the original key so they don't need to by stored separately by the server. Some other systems use hex-based codes instead, but presumably it's a similar process.
 
 ### Parting Thoughts
 
-Should you implement 2-factor auth, make sure your comparison method is safe from timing attacks. I did a quick survey of 2-factor libraries and of libraries at offered `verify` methods, most got it right. The easiest way to compare 2-factor codes in a constant time way is convert to `int`s first. [Google does it](https://github.com/google/google-authenticator-libpam/blob/master/src/pam_google_authenticator.c#L1385), so I think it's safe to say that's legit.
+Should you implement 2-factor auth, make sure your comparison method is safe from timing attacks. I did a quick survey of 2-factor libraries and of libraries that offered `verify` methods, most got it right. The easiest way to compare 2-factor codes in a constant time way is convert to `int`s first. [Google does it](https://github.com/google/google-authenticator-libpam/blob/master/src/pam_google_authenticator.c#L1385), so I think it's safe to say that's legit.
 
 If you want to find out when your 2-factor code will be your favorite number, you can use [this handy Python script](https://gist.github.com/rcoh/c4dc45825a322881a9c1b300d70c3941).
 
 [^1]: Python and Ruby differ from C and Golang, for instance: https://github.com/golang/go/issues/448
 
-[^2]: Having Md5 as the default for hmac isn't a completely disaster, but it isn't great. According to [RFC 6151](https://tools.ietf.org/html/rfc6151) "attacks on HMAC-MD5 do not seem to indicate a practical vulnerability when used as a message authentication code," but, "for a new protocol design, a ciphersuite with HMAC-MD5 should not be included."
+[^2]: Having Md5 as the default for hmac isn't a complete disaster, but it isn't great. According to [RFC 6151](https://tools.ietf.org/html/rfc6151) "attacks on HMAC-MD5 do not seem to indicate a practical vulnerability when used as a message authentication code," but, "for a new protocol design, a ciphersuite with HMAC-MD5 should not be included."
 
 [^3]: Never share your secret. Obviously.
