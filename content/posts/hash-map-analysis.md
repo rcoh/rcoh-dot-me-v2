@@ -2,7 +2,7 @@
 title: "An Analysis of Hash Map Implementations in Popular Languages"
 date: 2017-12-30T17:39:23-05:00
 draft: false
-tags: ["language-internals", "python", "hash-maps", "java", "c#", "c++", "golang", "algorithms", "scala"]
+tags: ["language-internals", "python", "hash-maps", "java", "csharp", "c++", "golang", "algorithms", "scala"]
 aliases:
  - /posts/hash-map-survey/
 ---
