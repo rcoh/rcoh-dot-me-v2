@@ -1,7 +1,7 @@
 ---
 title: "Resource Pools and Deadlock"
 date: 2018-01-11T09:17:30-08:00
-draft: true
+draft: false
 tags: ["deadlock", "python", "scala"]
 ---
 In the last 2 months, at two separate clients, I ran into the same type of deadlock, so I figured it was worth writing about to save someone else from the same fate.
