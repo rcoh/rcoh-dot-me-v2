@@ -1,0 +1,4 @@
+This is a Brave Payments publisher verification file.
+
+Domain: rcoh.me
+Token: a130b2639c14fab7183a02e786902b7ad03321045d6bc1015e90f3bff4d59037
