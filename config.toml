@@ -19,6 +19,7 @@ pygmentsCodeFences = true
 [params]
   mainSections = ["post"]
   favicon = ""
+  subscribe_url = "http://eepurl.com/dhk7F1"
   source = "https://github.com/rcoh/rcoh-dot-me-v2"
   description = "Russell Cohen's Blog and Website"
   facebook = ""
