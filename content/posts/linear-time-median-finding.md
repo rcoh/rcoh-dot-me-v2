@@ -181,9 +181,15 @@ Let's prove why the median-of-medians is a good pivot. To help, consider this vi
 
 The red oval denotes the medians of the chunks, and the center circle denotes the median-of-medians. Recall that we want our pivot to split the list as evenly as possible. In the worst possible case, every element in the blue rectangle (top left) will be less than or equal to our pivot. The top right quadrant contains 3/5 of half of the rows -- `3/5*1/2=3/10`. So, we'll always drop at least 30% of the rows at each step.
 
-But is dropping 30% of the elements at each step sufficient? At each step, our algorithm must to O(n) work and solve 1 subproblem 7/10 the size of the original, yielding the following equation: 
+But is dropping 30% of the elements at each step sufficient? At each step, our algorithm must do:
 
-$$T(n)=7T(\frac{n}{10})+n$$
+- O(n) work to partition the elements
+- Solve 1 subproblem 7/10 the size of the original to recurse
+- Solve 1 subproblem 1/5 the size of the original to compute the median of medians
+
+This yields the following equation for the total runtime, `T(n)`:
+
+$$T(n)=T(\frac{n}{5}\)+7T(\frac{n}{10})+n$$
 
 It's not straightforward to prove why this is `O(n)`. A quick solution is to defer to the [Master Theorem](https://en.wikipedia.org/wiki/Master_theorem_(analysis_of_algorithms)#Generic_form). We fall into case 3 of the master theorem where the work at each level dominates the work of the subproblems. In this case, our total work is just the work at each level, `O(n)`. 
 
