@@ -206,5 +206,7 @@ To finish out, here's a comparison of the elements considered by each implementa
 
 It's exactly what you would expect! The deterministic pivot almost always considers fewer elements in quickselect than the random pivot. Sometimes we get lucky and guess the pivot on the first try, which manifests itself as dips in the green line. Math works!
 
+P.S: In 2017 a [new paper](http://erdani.com/research/sea2017.pdf) came out that actually makes the median-of-medians approach competitive with other selection algorithms. Thanks to Reddit user /u/andralex for bringing it to my attention.
+
 [^2]: This could be an interesting application of radix sort if you were attempting to find the median in a list of integers, all less than 2^32.
 [^3]: Python actually uses Timsort, an impressive combination of theoretical bounds and practical performance. [Notes on Python Lists](/posts/notes-on-cpython-list-internals/)
