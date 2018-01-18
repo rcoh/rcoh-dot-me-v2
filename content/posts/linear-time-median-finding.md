@@ -194,7 +194,7 @@ We have quickselect, an algorithm that can find the median in linear time given 
 In the real world, selecting a median at random is almost always sufficient. Although the median-of-medians approach is still linear time, it just takes too long to compute in practice. The `C++` standard library uses an algorithm called [introselect](https://en.wikipedia.org/wiki/Introselect) which utilizes a combination of heapselect and quickselect and has an `O(n log n)` bound. Introselect allows you to use a generally fast algorithm with a poor upper bound in combination with an algorithm that is slower in practice but has a good upper bound. Implementations start with the fast algorithm, but fall back to the slower algorithm if they're unable to pick effective pivots.
 
 To finish out, here's a comparison of the elements considered by each implementation. This isn't runtime performance, but instead the total number of elements looked at by the quickselect function. It doesn't count the work to compute the median-of-medians.
-<iframe style="width: 100%; height: 800px" frameborder="0" scrolling="no" src="//plot.ly/~rcoh/14.embed"></iframe>
+<iframe style="width: 100%; height: 800px" frameborder="0" scrolling="no" src="//plot.ly/~rcoh/14.embed?link=false"></iframe>
 
 It's exactly what you would expect! The the deterministic pivot almost always considers fewer elements in quickselect than the random pivot. Sometimes we get lucky and guess the pivot on the first try, which manifests itself as dips in the green line. Math works!
 
