@@ -164,7 +164,8 @@ def pick_pivot(l):
 
     # It's a bit circular, but I'm about to prove that finding
     # the median of a list can be done in provably O(n).
-    # Finding the median of a list of length n/5 is therefore also O(n)
+    # Finding the median of a list of length n/5 is a subproblem of size n/5
+    # and this recursive call will be accounted for in our analysis.
     # We pass pick_pivot, our current function, as the pivot builder to
     # quickselect. O(n)
     median_of_medians = quickselect_median(medians, pick_pivot)
@@ -200,9 +201,10 @@ We have quickselect, an algorithm that can find the median in linear time given 
 In the real world, selecting a median at random is almost always sufficient. Although the median-of-medians approach is still linear time, it just takes too long to compute in practice. The `C++` standard library uses an algorithm called [introselect](https://en.wikipedia.org/wiki/Introselect) which utilizes a combination of heapselect and quickselect and has an `O(n log n)` bound. Introselect allows you to use a generally fast algorithm with a poor upper bound in combination with an algorithm that is slower in practice but has a good upper bound. Implementations start with the fast algorithm, but fall back to the slower algorithm if they're unable to pick effective pivots.
 
 To finish out, here's a comparison of the elements considered by each implementation. This isn't runtime performance, but instead the total number of elements looked at by the quickselect function. It doesn't count the work to compute the median-of-medians.
-<iframe style="width: 100%; height: 800px" frameborder="0" scrolling="no" src="//plot.ly/~rcoh/14.embed?link=false"></iframe>
 
-It's exactly what you would expect! The the deterministic pivot almost always considers fewer elements in quickselect than the random pivot. Sometimes we get lucky and guess the pivot on the first try, which manifests itself as dips in the green line. Math works!
+![Graph of elements visited](/images/medians-graph.png)
+
+It's exactly what you would expect! The deterministic pivot almost always considers fewer elements in quickselect than the random pivot. Sometimes we get lucky and guess the pivot on the first try, which manifests itself as dips in the green line. Math works!
 
 [^2]: This could be an interesting application of radix sort if you were attempting to find the median in a list of integers, all less than 2^32.
 [^3]: Python actually uses Timsort, an impressive combination of theoretical bounds and practical performance. [Notes on Python Lists](/posts/notes-on-cpython-list-internals/)
