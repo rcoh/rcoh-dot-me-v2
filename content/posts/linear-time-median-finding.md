@@ -43,17 +43,17 @@ First, we must pick a pivot. We randomly select index 3.
 The value at this index is 2.
 
 Partitioning based on the pivot:
-[1,0,2], [3,4,6,8,7,10,5]
+[1,0,2], [9,3,4,6,8,7,10,5]
 We want the 6th element. 6-len(left) = 3, so we want 
 the third smallest element in the right array 
 
 We're now looking for third smallest element in the array below:
-[3,4,6,8,7,10,5]
+[9,3,4,6,8,7,10,5]
 We pick an index at random to be our pivot. 
-We pick index 2, the value at which, l[2]=6
+We pick index 3, the value at which, l[3]=6
 
 Partitioning based on the pivot:
-[3,4,5,6] [7,10]
+[3,4,5,6] [9,7,10]
 We want the 3rd smallest element, so we know it's the 
 3rd smallest element in the left array
 
@@ -200,13 +200,15 @@ We have quickselect, an algorithm that can find the median in linear time given 
 ### Linear Time Medians In Practice
 In the real world, selecting a median at random is almost always sufficient. Although the median-of-medians approach is still linear time, it just takes too long to compute in practice. The `C++` standard library uses an algorithm called [introselect](https://en.wikipedia.org/wiki/Introselect) which utilizes a combination of heapselect and quickselect and has an `O(n log n)` bound. Introselect allows you to use a generally fast algorithm with a poor upper bound in combination with an algorithm that is slower in practice but has a good upper bound. Implementations start with the fast algorithm, but fall back to the slower algorithm if they're unable to pick effective pivots.
 
-To finish out, here's a comparison of the elements considered by each implementation. This isn't runtime performance, but instead the total number of elements looked at by the quickselect function. It doesn't count the work to compute the median-of-medians.
+To finish out, here's a comparison of the elements considered by each implementation. This isn't runtime performance, but instead the total number of elements looked at by the quickselect function. It doesn't count the work to compute the median-of-medians. The point of this graph **is not** to demonstrate that median-of-medians is a good algorithm, but rather to demonstrate that it's an effective way to pick pivots.
 
 ![Graph of elements visited](/images/medians-graph.png)
 
 It's exactly what you would expect! The deterministic pivot almost always considers fewer elements in quickselect than the random pivot. Sometimes we get lucky and guess the pivot on the first try, which manifests itself as dips in the green line. Math works!
 
-P.S: In 2017 a [new paper](http://erdani.com/research/sea2017.pdf) came out that actually makes the median-of-medians approach competitive with other selection algorithms. Thanks to Reddit user /u/andralex for bringing it to my attention.
+P.S: In 2017 a [new paper](http://erdani.com/research/sea2017.pdf) came out that actually makes the median-of-medians approach competitive with other selection algorithms. Thanks to the paper's author, Andrei Alexandrescu for bringing it to my attention!
+
+Thanks to Leah Alpert for reading drafts of this post. Reddit users `axjv` and `linkazoid` pointed out that `9` mysteriously disappeared in my example which has since been fixed.
 
 [^2]: This could be an interesting application of radix sort if you were attempting to find the median in a list of integers, all less than 2^32.
 [^3]: Python actually uses Timsort, an impressive combination of theoretical bounds and practical performance. [Notes on Python Lists](/posts/notes-on-cpython-list-internals/)
