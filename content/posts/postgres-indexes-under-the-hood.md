@@ -22,7 +22,7 @@ In binary search trees, each node has two pointers, one for all lesser values, a
 - The second pointer, between 7 and 16 points to values between 7 and 16
 - The third and final pointer, between 16 and the end points to values greater than 16.
 
-Retrieving an item from a B-Tree is straightforward.
+To make things concrete, I've implemented a completely useless B-Tree in Python:
 
 
 [^1]: The default blocksize of 8KB is mentioned in passing [here](https://wiki.postgresql.org/wiki/FAQ#How_much_database_disk_space_is_required_to_store_data_from_a_typical_text_file.3F). In the code its a bit hard to chase down, because it's configured when Postgres is [being compiled](https://github.com/postgres/postgres/blob/2082b37/configure#L1513-L1514).
