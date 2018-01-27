@@ -2,7 +2,7 @@
 title: "No Magic: Regular Expressions, Part 2"
 date: 2016-12-30T11:41:35-05:00
 draft: false
-tags: ["no-magic", "scala"]
+tags: ["no-magic", "scala", "algorithms"]
 ---
 The code for this post, as well as the post itself, are on [github](https://github.com/rcoh/toyregex).
 

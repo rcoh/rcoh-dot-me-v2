@@ -1,7 +1,7 @@
 ---
 title: "PSA: Python Float Overflow"
 date: 2018-01-24T08:56:36-08:00
-tags: ["python", "language-internals"]
+tags: ["python"]
 draft: false
 ---
 Python 2 and Python 3 provide arbitrary precision integers. This means that you don't need to worry about overflowing or underflowing the integer datatypes, _ever_. `2**10000`? No problem. It makes it pretty convenient to write code. Floats, however, are not arbitrary precision:
