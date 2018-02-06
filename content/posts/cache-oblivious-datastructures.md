@@ -105,7 +105,7 @@ Thanks to Leah Alpert for reading drafts of this post, suggesting structural ref
 
 ***
 
-Want to get emailed about new blog posts? I post about once a week on topics like [databases](/tags/databases), [language internals](/tags/language-internals), and [algorithms](/tags/algorithms). [Subscribe!](http://eepurl.com/dhk7F1)
+Want to get emailed about new blog posts? [Subscribe!](http://eepurl.com/dhk7F1) I post about once a week on topics like [databases](/tags/databases), [language internals](/tags/language-internals), and [algorithms](/tags/algorithms). 
 
 *** 
 
