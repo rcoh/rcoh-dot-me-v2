@@ -20,7 +20,7 @@ The graph shows the time in nanoseconds to retrieve an element from a binary sea
 * The orange line is a tree that's been layed out in a preorder (depth first) traversal. 
 * The green line is a tree that's been layed out with a so-called "recursive blocking" approach which is cache-oblivious. **It is almost twice as fast for a tree with 16 million elements!**
 
-You can find the code I wrote to test out different strategies [on Github](https://github.com/rcoh/treelayout).
+You can find the code I wrote to test out different strategies [on Github](https://github.com/rcoh/treelayout). It's written and Golang and utilizes their very helpful *built in (!)* benchmarking tools.
 
  The rest of this post is dedicated to answering 2 questions:
 
