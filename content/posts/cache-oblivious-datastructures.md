@@ -81,7 +81,7 @@ If we're traversing this tree from root to leaves, each row will be in a differe
 This approach is the orange line in the graph. it's a bit better than the blue line, but pretty similar in the limit. This approach use what might be called a "depth-first" layout, proceeding down each branch before continuing on to the next one. As an aid, I've circled consescutive groups of 4 items within the tree to get an idea of the type of blocking behavior we'll see. It's easy to see these blocks are a little more useful than the breadth first approach. If we're going down the far left branch, we'll only have to read a single block. But it's also easy to see the shortcomings: In a large tree, going down the far right branch will only use 1 item from each block. 
 
 ### Recursive Block Approach
-This approach is the green line in the graph. In designing cache-oblivious data structures and algorithms, a divide-and-conquer strategy frequently bears fruit. This stems from the fact that divide an conquer algorithms naturally break the work in subproblems of increasingly smaller sizes -- one of those sizes will be close to `\(B\)` and constrain the number of blocks you need to read. We'll take a similar approach in laying our our cache-oblivious static BST.
+This approach is the green line in the graph. In designing cache-oblivious data structures and algorithms, a divide and conquer strategy frequently bears fruit. This stems from the fact that divide and conquer algorithms naturally break the work in subproblems of increasingly smaller sizes -- one of those sizes will be close to `\(B\)` and constrain the number of blocks you need to read. We'll take a similar approach in laying our our cache-oblivious static BST.
 
 To start, split the tree at half height. If the height of the tree is `\(\log(N)\)`, the top section will contain `\(2^{log_2(N)/2}=\sqrt{N}\)` nodes. Each of the child nodes will also contain `\(\approx \sqrt{N}\)` elements. This splitting process is recursive -- each section of the tree is split until there are no nodes left to split.
 
@@ -89,9 +89,9 @@ To start, split the tree at half height. If the height of the tree is `\(\log(N)
 
 The figure above demonstrates a cache-oblivious memory layout for a binary search tree with 5 levels. The blocks are circled in green and the super-blocks are circled in orange. I've omitted the right branch to remove some visual clutter.
 
-The key property of our layout strategy is that all "blocks" are laid out contiguously in memory. Critically, all "super blocks" are also contiguous. This means that no matter what `\(B\)` is, we'll always be reading useful data. The key here is that the bigger the block you're reading, the more levels you will go down the tree. Specifically, if we read a block of size `\(B\)`, we'll be able to go `\(\log_2B\)` levels down the tree. Since the tree has `\(\log_2N\)` levels. This leads to the following result for what I'm calling `\(B(N)\)`, the number of blocks read for a tree of size `\(N\)`:
+The key property of our layout strategy is that all "blocks" are laid out contiguously in memory. Critically, all "super blocks" are also contiguous. This means that no matter what `\(B\)` is, we'll always be reading useful data. The key here is that the bigger the block you're reading, the more levels you will go down the tree before needing to read an additional block. Specifically, if we read a block of size `\(B\)`, we'll be able to go `\(\log_2B\)` levels down the tree. The tree has `\(\log_2N\)` levels. This leads to the following result for what I'm calling `\(F(N)\)`, the number of blocks read for a tree of size `\(N\)`:
 
-`$$B(N)=\frac{log_2N}{\log_2B}=\log_BN$$`
+`$$F(N)=\frac{\log_2N}{\log_2B}=\log_BN$$`
 
 I'm dropping a some complexity in favor of simplicity; if this feels hand-wavy, you can find a more rigorous proof in the paper. Here's the important part: as `\(B\)` grows, the number of blocks we read shrinks. Success!
 
