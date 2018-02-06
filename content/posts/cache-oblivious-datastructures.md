@@ -16,18 +16,18 @@ If we could do this, our code would optimally utilize all cache layers without t
 
 The graph shows the time in nanoseconds to retrieve an element from a binary search tree vs. the number of elements in the tree. The series show 3 different ways of laying out the tree in memory. 
 
-* The blue line is a tree that's been layed out level by level, essentially, a breadth first traversal of the tree. 
-* The orange line is a tree that's been layed out in a preorder (depth first) traversal. 
-* The green line is a tree that's been layed out with a so-called "recursive blocking" approach which is cache-oblivious. **It is almost twice as fast for a tree with 16 million elements!**
+* The blue line is a tree that's been laid out level by level, essentially, a breadth first traversal of the tree. 
+* The orange line is a tree that's been laid out in a preorder (depth first) traversal. 
+* The green line is a tree that's been laid out with a so-called "recursive blocking" approach which is cache-oblivious. **It is almost twice as fast for a tree with 16 million elements!**
 
-You can find the code I wrote to test out different strategies [on Github](https://github.com/rcoh/treelayout). It's written and Golang and utilizes their very helpful *built in (!)* benchmarking tools.
+You can find the code I wrote to test out different strategies [on Github](https://github.com/rcoh/treelayout). It's written in Golang and utilizes their very helpful *built in (!)* benchmarking tools.
 
  The rest of this post is dedicated to answering 2 questions:
 
-1. **How is the green-line tree layed out in memory?**
+1. **How is the green-line tree laid out in memory?**
 2. **Why is it so much faster?**
 
-If you want to know more about anything I'm talking about here, Erik Demaine's [2002 survey paper](http://erikdemaine.org/papers/BRICS2002/paper.pdf) covers the subject with far more rigor and detail than I'll be able to accomplish in this post. 
+If you want to know more about anything I'm talking about here, Erik Demaine's [2002 survey paper](http://erikdemaine.org/papers/BRICS2002/paper.pdf) covers the subject with far more rigor and detail than I'll go into in this post.
 
 
 
@@ -37,15 +37,15 @@ If you want to know more about anything I'm talking about here, Erik Demaine's [
 
 1. The overall goal is to make use of every byte we read when we read an entire block. 
 
-If your data structure or algorithm is recursive (like a tree), it should be layed out in larger and larger chunks, starting from the smallest atomic unit, going up to the entire data structure. At _each level_ of the hierarchy, the data should be stored in a contiguous section of memory. If the hardware has some cache size `\(B\)`, then there will be some block size within your data structure that is nearly `\(B\)`. 
+If your data structure or algorithm is recursive (like a tree), it should be laid out in larger and larger chunks, starting from the smallest atomic unit, going up to the entire data structure. At _each level_ of the hierarchy, the data should be stored in a contiguous section of memory. If the hardware has some cache size `\(B\)`, then there will be some block size within your data structure that is nearly `\(B\)`. 
 
 2. -->
 
 
 ## A new scheme for analyzing algorithms
-Big-O notation by itself can't explain the differences we're seeing. The code to search the trees is identical -- the only difference is the order the nodes in the tree are layed out in memory. 
+Big-O notation by itself can't explain the differences we're seeing. The code to search the trees is identical -- the only difference is the order the nodes in the tree are laid out in memory. 
 
-In standard algorithmic analysis, we implicitly assume that reading from memory is directly proportional to amount of bytes we read. Read one byte, pay for one byte. But the real world doesn't work this way: the layers of software and hardware below your programming language don't work in individual bytes; they work in blocks.[^2] If you want to read one byte, you need to pay for the whole block. If you read more bytes from that block, those reads are nearly free. To analyze our algorithms, we'll develop a model that's closer to how things work in the real world.
+In standard algorithmic analysis, we implicitly assume that the cost of reading from memory is directly proportional to amount of bytes we read. Read one byte, pay for one byte. But the real world doesn't work this way: the layers of software and hardware below your programming language don't work in individual bytes; they work in blocks.[^2] If you want to read one byte, you need to pay for the whole block. If you read more bytes from that block, those reads are nearly free. To analyze our algorithms, we'll develop a model that's closer to how things work in the real world.
 
 In developing algorithms that perform optimally regardless of cache size, we'll assume that we have 2 areas of memory: the small fast layer, and the big slow layer. Memory can only be moved from the slow layer to the fast layer in fixed size blocks of size `\(B\)`. The slow layer is infinitely sized, and the fast layer has size `\(M\)`.[^assum] When we analyze our algorithms we'll analyze them in terms of `\(M\)`, the size of our cache, and `\(B\)`, the size of blocks in the cache. Our analyses must hold for any values of `\(M\)` and `\(B\)`. Futhermore, the unit of work we'll be analyzing is loading a block from slow memory into fast memory -- other work is considered much faster and not included. 
 
@@ -100,6 +100,8 @@ I'm dropping a some complexity in favor of simplicity; if this feels hand-wavy, 
 ## Cache-Oblivious Data structures IRL
 
 A static search tree isn't really a general purpose data structure, but the ideas about recursively grouping data in memory are widely applicable. Beyond static BSTs, there are cache-oblivious sorting algorithms, hash tables, B-Trees, priority queues, and more. I won't go into detail here, but you can read about them in [Demaine's survey paper](http://erikdemaine.org/papers/BRICS2002/paper.pdf). Cache-oblivious B-Trees are especially effective in practice. They are typically referred to as [Fractal Tree Indexes](https://en.wikipedia.org/wiki/Fractal_tree_index). Given the fractal nature of cache oblivious BSTs, the name shouldn't be a surprise. Tokutek, acquired by Percona in 2015, created cache-oblivious storage engines for several major databases with significantly improved performance. Personally, I find theory working out in practice especially satisfying.
+
+Thanks to Leah Alpert for reading drafts of this post, suggesting structural refactorings, and suggesting adding that I include the `leveled` tree layout.
 
 ***
 
