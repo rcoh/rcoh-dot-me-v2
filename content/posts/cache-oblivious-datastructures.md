@@ -1,5 +1,5 @@
 ---
-title: "Maximize Cache Performance with this One Weird Trick or: Cache-Oblivious Data Structures"
+title: "Maximize Cache Performance with this One Weird Trick: An Introduction to Cache-Oblivious Data Structures"
 date: 2018-01-29T22:44:14-08:00
 draft: false
 tags: ["algorithms", "performance"]
