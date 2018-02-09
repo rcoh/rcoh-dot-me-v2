@@ -1,7 +1,7 @@
 ---
 title: "Hire Me"
 date: 2018-02-08T20:32:24-08:00
-draft: true
+draft: false
 ---
 If you're interested in hiring me for a contracting engagement, send me an email at `*@*.me` where `*` is rcoh. Please note that I'm only looking for contract work at the moment (no salaried, full-time).
 
