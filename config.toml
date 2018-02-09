@@ -32,4 +32,4 @@ pygmentsCodeFences = true
   featured_image = "/images/bishop_sunrise_2.jpg"
   recent_posts_number = 2
   resume = "/docs/resume.pdf"
-  hireme = "mailto:rcoh@rcoh.me"
+  hireme = "/hire-me"
