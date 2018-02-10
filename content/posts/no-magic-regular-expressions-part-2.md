@@ -141,4 +141,7 @@ In the debugging process, I wrote a quick script to generate `dot` files from NF
 
 [![aorb.dot.png](https://svbtleusercontent.com/mfdc04hix1g8kg_small.png)](https://svbtleusercontent.com/mfdc04hix1g8kg.png)
 
-Now that we have an NFA (the hard part) all we have to do is evaluate it (the easier part). [Part 3](https://rcoh.svbtle.com/no-magic-regular-expressions-part-3), focusing on evaluating an NFA, concludes this series.
+Now that we have an NFA (the hard part) all we have to do is evaluate it (the easier part). [Part 3](/posts/no-magic-regular-expressions-part-3), focusing on evaluating an NFA, concludes this series.
+
+***
+{{% subscribe %}}

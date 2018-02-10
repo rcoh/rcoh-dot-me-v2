@@ -90,3 +90,6 @@ This is especially nefarious in Scala because the shared resource pool, which, i
 When writing code involving a set of shared resources, be vigilant to ensure that 1 thread never requests a second resource while already holding a resource. The problem won't show up in testing, where you typically only have 1 thread. It probably won't show up immediately on prod. It will show up the next time there is a load spike and the critical threshold of concurrent threads is reached to cause deadlock and your code will hang at the worst possible moment.
 
 If this was interesting to you, you might also find it interesting that Postgres has a deadlock detector. It's super cool and you can read about it [here](https://github.com/postgres/postgres/tree/master/src/backend/storage/lmgr). Search for "Deadlock Detection algorithm"
+
+***
+{{% subscribe %}}

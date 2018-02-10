@@ -209,6 +209,9 @@ chaining to open addressing especially interesting since it apparently improved 
 
 Did I miss your favorite language? Let me know in the comments or by email, `*+hashtables@*.me` where `* = rcoh`.
 
+***
+{{% subscribe %}}
+
 [^1]: https://github.com/ruby/ruby/blob/fc939f6/st.c#L93-L94
 [^2]: https://github.com/python/cpython/blob/60c3d35/Objects/dictobject.c#L54-L63
 [^3]: https://github.com/python/cpython/blob/60c3d35/Objects/dictobject.c#L398-L408

@@ -120,3 +120,6 @@ That's all there is to it. A semi-functional regex implementation in just 106 li
 5. Any many more.
 
 I hope this simple implementation helps you understand what's going on under the hood! It's worth mentioning that the performance of this evaluator is heinous. Truly terrible. Perhaps in a future post I'll look into why and talk about ways to optimize it...
+
+***
+{{% subscribe %}}

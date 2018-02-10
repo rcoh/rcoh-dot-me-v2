@@ -25,3 +25,6 @@ def backoff_time(retry_count, initial_backoff, max_backoff):
 It will work fine as along as `initial_backoff` is integral, but if someone wants to have an `initial_backoff < 1`, you're at risk of overflow.
 
 Happy coding!
+
+***
+{{% subscribe %}}

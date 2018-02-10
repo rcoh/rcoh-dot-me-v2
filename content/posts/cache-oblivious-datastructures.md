@@ -14,10 +14,10 @@ If we could do this, our code would optimally utilize all cache layers without t
 
 ![BST Read Performance](/images/cache-oblivious-graph.png)
 
-The graph shows the time in nanoseconds to retrieve an element from a binary search tree vs. the number of elements in the tree. The series show 3 different ways of laying out the tree in memory. 
+The graph shows the time in nanoseconds to retrieve an element from a binary search tree vs. the number of elements in the tree. The series show 3 different ways of laying out the tree in memory.
 
-* The blue line is a tree that's been laid out level by level, essentially, a breadth first traversal of the tree. 
-* The orange line is a tree that's been laid out in a preorder (depth first) traversal. 
+* The blue line is a tree that's been laid out level by level, essentially, a breadth first traversal of the tree.
+* The orange line is a tree that's been laid out in a preorder (depth first) traversal.
 * The green line is a tree that's been laid out with a so-called "recursive blocking" approach which is cache-oblivious. **It is almost twice as fast for a tree with 16 million elements!**
 
 You can find the code I wrote to test out different strategies [on Github](https://github.com/rcoh/treelayout). It's written in Golang and utilizes their very helpful *built in (!)* benchmarking tools.
@@ -35,25 +35,25 @@ If you want to know more about anything I'm talking about here, Erik Demaine's [
 
 <!--
 
-1. The overall goal is to make use of every byte we read when we read an entire block. 
+1. The overall goal is to make use of every byte we read when we read an entire block.
 
-If your data structure or algorithm is recursive (like a tree), it should be laid out in larger and larger chunks, starting from the smallest atomic unit, going up to the entire data structure. At _each level_ of the hierarchy, the data should be stored in a contiguous section of memory. If the hardware has some cache size `\(B\)`, then there will be some block size within your data structure that is nearly `\(B\)`. 
+If your data structure or algorithm is recursive (like a tree), it should be laid out in larger and larger chunks, starting from the smallest atomic unit, going up to the entire data structure. At _each level_ of the hierarchy, the data should be stored in a contiguous section of memory. If the hardware has some cache size `\(B\)`, then there will be some block size within your data structure that is nearly `\(B\)`.
 
 2. -->
 
 
 ## A new scheme for analyzing algorithms
-Big-O notation by itself can't explain the differences we're seeing. The code to search the trees is identical -- the only difference is the order the nodes in the tree are laid out in memory. 
+Big-O notation by itself can't explain the differences we're seeing. The code to search the trees is identical -- the only difference is the order the nodes in the tree are laid out in memory.
 
 In standard algorithmic analysis, we implicitly assume that the cost of reading from memory is directly proportional to amount of bytes we read. Read one byte, pay for one byte. But the real world doesn't work this way: the layers of software and hardware below your programming language don't work in individual bytes; they work in blocks.[^2] If you want to read one byte, you need to pay for the whole block. If you read more bytes from that block, those reads are nearly free. To analyze our algorithms, we'll develop a model that's closer to how things work in the real world.
 
-In developing algorithms that perform optimally regardless of cache size, we'll assume that we have 2 areas of memory: the small fast layer, and the big slow layer. Memory can only be moved from the slow layer to the fast layer in fixed size blocks of size `\(B\)`. The slow layer is infinitely sized, and the fast layer has size `\(M\)`.[^assum] When we analyze our algorithms we'll analyze them in terms of `\(M\)`, the size of our cache, and `\(B\)`, the size of blocks in the cache. Our analyses must hold for any values of `\(M\)` and `\(B\)`. Futhermore, the unit of work we'll be analyzing is loading a block from slow memory into fast memory -- other work is considered much faster and not included. 
+In developing algorithms that perform optimally regardless of cache size, we'll assume that we have 2 areas of memory: the small fast layer, and the big slow layer. Memory can only be moved from the slow layer to the fast layer in fixed size blocks of size `\(B\)`. The slow layer is infinitely sized, and the fast layer has size `\(M\)`.[^assum] When we analyze our algorithms we'll analyze them in terms of `\(M\)`, the size of our cache, and `\(B\)`, the size of blocks in the cache. Our analyses must hold for any values of `\(M\)` and `\(B\)`. Futhermore, the unit of work we'll be analyzing is loading a block from slow memory into fast memory -- other work is considered much faster and not included.
 
 Algorithms that make good use of the cache have the following very important property: **When we read a block of data, we make use of every byte in that block.** This property means that our algorithm will read fewer blocks as `\(B\)` increases.
 
 ## Warm up: Finding the maximum in an array
 
-A lot of algorithms are cache-oblivious  without modification. Consider finding the maximum element in an array. Unless you've preprocessed the array in some way, you can't do better than scanning the array and tracking the maximum. It's pretty easy to see why this algorithm is cache optimal: Assuming the array is contiguous in memory, we'll make use of every byte from every block we read, _except_ for the ends. At each end if the array, we may make only partial use of 1 block on either end due to alignment.[^scanproof] 
+A lot of algorithms are cache-oblivious  without modification. Consider finding the maximum element in an array. Unless you've preprocessed the array in some way, you can't do better than scanning the array and tracking the maximum. It's pretty easy to see why this algorithm is cache optimal: Assuming the array is contiguous in memory, we'll make use of every byte from every block we read, _except_ for the ends. At each end if the array, we may make only partial use of 1 block on either end due to alignment.[^scanproof]
 
 
 ## Binary Search Trees
@@ -78,7 +78,7 @@ If we're traversing this tree from root to leaves, each row will be in a differe
 ### Preorder (Depth First)
 ![Depth First BST](/images/depthfirst.svg)
 
-This approach is the orange line in the graph. it's a bit better than the blue line, but pretty similar in the limit. This approach use what might be called a "depth-first" layout, proceeding down each branch before continuing on to the next one. As an aid, I've circled consescutive groups of 4 items within the tree to get an idea of the type of blocking behavior we'll see. It's easy to see these blocks are a little more useful than the breadth first approach. If we're going down the far left branch, we'll only have to read a single block. But it's also easy to see the shortcomings: In a large tree, going down the far right branch will only use 1 item from each block. 
+This approach is the orange line in the graph. it's a bit better than the blue line, but pretty similar in the limit. This approach use what might be called a "depth-first" layout, proceeding down each branch before continuing on to the next one. As an aid, I've circled consescutive groups of 4 items within the tree to get an idea of the type of blocking behavior we'll see. It's easy to see these blocks are a little more useful than the breadth first approach. If we're going down the far left branch, we'll only have to read a single block. But it's also easy to see the shortcomings: In a large tree, going down the far right branch will only use 1 item from each block.
 
 ### Recursive Block Approach
 This approach is the green line in the graph. In designing cache-oblivious data structures and algorithms, a divide and conquer strategy frequently bears fruit. This stems from the fact that divide and conquer algorithms naturally break the work in subproblems of increasingly smaller sizes -- one of those sizes will be close to `\(B\)` and constrain the number of blocks you need to read. We'll take a similar approach in laying our our cache-oblivious static BST.
@@ -104,19 +104,13 @@ A static search tree isn't really a general purpose data structure, but the idea
 Thanks to Leah Alpert for reading drafts of this post, suggesting structural refactorings, and suggesting that I include the `leveled` tree layout.
 
 ***
-
-Want to get emailed about new blog posts? [Subscribe!](http://eepurl.com/dhk7F1) I post about once a week on topics like [databases](/tags/databases), [language internals](/tags/language-internals), and [algorithms](/tags/algorithms). 
-
-*** 
-
-Do you want to hire me? I'm available for engagements from 1 week to a few months. Email me at `*@*.me`, where `* = rcoh`.
-
+{{% subscribe %}}
 
 [^1]: One example is running Postgres on SSDs. For various reasons, SSDs to better with smaller block sizes: https://blog.pgaddict.com/posts/postgresql-on-ssd-4kb-or-8kB-pages
-[^2]: As you move from CPU caches (L1, L2, L3), to operating system level page caches, these blocks go from bytes in the L1 cache to kilobytes at the operating system level. 
+[^2]: As you move from CPU caches (L1, L2, L3), to operating system level page caches, these blocks go from bytes in the L1 cache to kilobytes at the operating system level.
 [^3]: [^4]: Specifically, , . The paper contains reasonable justifications for why these are OK.
 [^5]: The proof is based the number of bits of information required to locate an element divided by the number of bits yielded per block read. See section 4.1 of [the paper](http://erikdemaine.org/papers/BRICS2002/paper.pdf) for details.
-[^assum]: To prove most cache-oblivious  results, there are a number of assumptions required: 
+[^assum]: To prove most cache-oblivious  results, there are a number of assumptions required:
 
     - The fast layer is a fully-associative cache (meaning it acts like a hash table; we can put any block anywhere). This isn't how real CPU caches work. They are usually 2-8x associative. If a cache is N-way associative, then we have N different places in our cache this block is allowed to go. Fully associative means blocks can go anywhere, which just isn't real. But we've got to start somewhere!
     - We always evict the block that will be used as far as possible in the future (optimal eviction strategy)

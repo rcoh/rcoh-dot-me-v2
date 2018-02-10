@@ -154,4 +154,7 @@ Finally, a touch of helper code to finish it off:
 
 That's it! If you take this Scala code you'll be able to generate parse trees for any regular expression that meets the spec. The resulting data structures will be trees.
 
-Now that we can convert our regular expressions into syntax trees, we're well underway to being able to evaluate them. I wrote about the next steps [in part 2](http://rcoh.svbtle.com/regular-expressions-part-2). As always, the [code](https://www.github.com/rcoh/toyregex) is on Github.
+Now that we can convert our regular expressions into syntax trees, we're well underway to being able to evaluate them. I wrote about the next steps [in part 2](posts/no-magic-regular-expressions-part-2). As always, the [code](https://www.github.com/rcoh/toyregex) is on GitHub.
+
+***
+{{% subscribe %}}

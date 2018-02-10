@@ -64,6 +64,9 @@ While unique constraints are great for maintaining application level consistency
 
 Thanks to Leah Alpert for being unlucky enough to run into this in production, and figuring out what was going on. Her research was the basis for this post.
 
+***
+{{% subscribe %}}
+
 [^1]: https://www.postgresql.org/docs/9.1/static/runtime-config-locks.html
 [^2]: [Postgres source](https://github.com/postgres/postgres/blob/382ceff/src/backend/executor/execIndexing.c#L796) `xwait` is the transaction that is also attempting to insert the same value. It's not obvious to me why Postgres implements unique indices in this way. One could imagine an implementation that let both transactions continue and the second one to commit would fail. One possible explanation is that this prevents the database from doing wasted work.
 [^3]: From https://www.postgresql.org/docs/9.3/static/view-pg-locks.html: Every transaction holds an exclusive lock on its virtual transaction ID for its entire duration. If a permanent ID is assigned to the transaction (which normally happens only if the transaction changes the state of the database), it also holds an exclusive lock on its permanent transaction ID until it ends. When one transaction finds it necessary to wait specifically for another transaction, it does so by attempting to acquire share lock on the other transaction ID (either virtual or permanent ID depending on the situation). That will succeed only when the other transaction terminates and releases its locks.

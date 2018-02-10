@@ -27,7 +27,7 @@ Although this method offers the simplest code, it's certainly not the fastest.
 Our next step will be to _usually_ find the median within linear time, assuming we don't get unlucky. This algorithm, called "quickselect", was devevloped by Tony Hoare who also invented the similarly-named quicksort. It's a recursive algorithm that can find any element (not just the median).
 
 1. Pick an index in the list. It doesn't matter how you pick it, but choosing one at random works well in practice. The element at this index is called the **pivot**.
-2. Split the list into 2 groups: 
+2. Split the list into 2 groups:
     1. Elements less than or equal to the pivot, `lesser_els`
     2. Elements strictly greater than the pivot, `great_els`
 3. We know that one of these groups contains the median. Suppose we're looking for the *kth* element:
@@ -38,23 +38,23 @@ Here's an example of the algorithm running on a list with 11 elements:
 ```
 Consider the list below. We'd like to find the median.
 l = [9,1,0,2,3,4,6,8,7,10,5]
-len(l) == 11, so we're looking for the 6th smallest element 
-First, we must pick a pivot. We randomly select index 3. 
+len(l) == 11, so we're looking for the 6th smallest element
+First, we must pick a pivot. We randomly select index 3.
 The value at this index is 2.
 
 Partitioning based on the pivot:
 [1,0,2], [9,3,4,6,8,7,10,5]
-We want the 6th element. 6-len(left) = 3, so we want 
-the third smallest element in the right array 
+We want the 6th element. 6-len(left) = 3, so we want
+the third smallest element in the right array
 
 We're now looking for third smallest element in the array below:
 [9,3,4,6,8,7,10,5]
-We pick an index at random to be our pivot. 
+We pick an index at random to be our pivot.
 We pick index 3, the value at which, l[3]=6
 
 Partitioning based on the pivot:
 [3,4,5,6] [9,7,10]
-We want the 3rd smallest element, so we know it's the 
+We want the 3rd smallest element, so we know it's the
 3rd smallest element in the left array
 
 We're now looking for the 3rd smallest in the array below:
@@ -63,13 +63,13 @@ We pick an index at random to be our pivot.
 We pick index 1, the value at which, l[1]=4
 Partitioning based on the pivot:
 [3,4] [5,6]
-We're looking for the item at index 3, so we know it's 
+We're looking for the item at index 3, so we know it's
 the smallest in the right array.
 
 We're now looking for the smallest element in the array below:
 [5,6]
 
-At this point, we can have a base case that chooses the larger 
+At this point, we can have a base case that chooses the larger
 or smaller item based on the index.
 We're looking for the smallest item, which is 5.
 return 5
@@ -116,7 +116,7 @@ def quickselect(l, k, pivot_fn):
 Quickselect excels in the real world: It has almost no overhead and operates in average `O(n)`. Let's prove it.
 
 #### Proof of Average O(n)
-On average, the pivot will split the list into 2 approximately equal-sized pieces. Therefore, each subsequent recursion operates on 1/2 the data of the previous step. 
+On average, the pivot will split the list into 2 approximately equal-sized pieces. Therefore, each subsequent recursion operates on 1/2 the data of the previous step.
 
 $$C=n+\frac{n}{2}+\frac{n}{4}+\frac{n}{8}+...=2n=O(n)$$
 
@@ -141,9 +141,9 @@ def pick_pivot(l):
 
     # If there are < 5 items, just return the median
     if len(l) < 5:
-        # In this case, we fall back on the first median function we wrote. 
-        # Since we only run this on a list of 5 or fewer items, it doesn't 
-        # depend on the length of the input and can be considered constant 
+        # In this case, we fall back on the first median function we wrote.
+        # Since we only run this on a list of 5 or fewer items, it doesn't
+        # depend on the length of the input and can be considered constant
         # time.
         return nlogn_median(l)
 
@@ -155,7 +155,7 @@ def pick_pivot(l):
 
 
     # Next, we sort each chunk. Each group is a fixed length, so each sort
-    # takes constant time. Since we have n/5 chunks, this operation 
+    # takes constant time. Since we have n/5 chunks, this operation
     # is also O(n)
     sorted_groups = [sorted(chunk) for chunk in full_chunks]
 
@@ -192,7 +192,7 @@ This yields the following equation for the total runtime, `T(n)`:
 
 $$T(n)=T(\frac{n}{5}\)+7T(\frac{n}{10})+n$$
 
-It's not straightforward to prove why this is `O(n)`. A quick solution is to defer to the [Master Theorem](https://en.wikipedia.org/wiki/Master_theorem_(analysis_of_algorithms)#Generic_form). We fall into case 3 of the master theorem where the work at each level dominates the work of the subproblems. In this case, our total work is just the work at each level, `O(n)`. 
+It's not straightforward to prove why this is `O(n)`. A quick solution is to defer to the [Master Theorem](https://en.wikipedia.org/wiki/Master_theorem_(analysis_of_algorithms)#Generic_form). We fall into case 3 of the master theorem where the work at each level dominates the work of the subproblems. In this case, our total work is just the work at each level, `O(n)`.
 
 ### Recap
 We have quickselect, an algorithm that can find the median in linear time given a sufficiently good pivot. We have our median-of-medians algorithm, an `O(n)` algorithm to select a pivot (which is good enough for quickselect). Combining the two, we have an algorithm to find the median (or the nth element of a list) in linear time!
@@ -209,6 +209,9 @@ It's exactly what you would expect! The deterministic pivot almost always consid
 P.S: In 2017 a [new paper](http://erdani.com/research/sea2017.pdf) came out that actually makes the median-of-medians approach competitive with other selection algorithms. Thanks to the paper's author, Andrei Alexandrescu for bringing it to my attention!
 
 Thanks to Leah Alpert for reading drafts of this post. Reddit users `axjv` and `linkazoid` pointed out that `9` mysteriously disappeared in my example which has since been fixed.
+
+***
+{{% subscribe %}}
 
 [^2]: This could be an interesting application of radix sort if you were attempting to find the median in a list of integers, all less than 2^32.
 [^3]: Python actually uses Timsort, an impressive combination of theoretical bounds and practical performance. [Notes on Python Lists](/posts/notes-on-cpython-list-internals/)

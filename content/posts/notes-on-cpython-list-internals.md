@@ -52,6 +52,7 @@ for (i = 0; i < len; i++) {
   dest[i] = v;
 }
 ```
+
 [link to CPython slice code](https://github.com/python/cpython/blob/1fb72d2ad243c965d4432b4e93884064001a2607/Objects/listobject.c#L447-L451)
 
 ## Slice Assignment
@@ -76,6 +77,9 @@ An interesting tidbit: For sorting small arrays (or small sections of a larger a
 Did I miss something cool about CPython lists? Let me know in the [comments](https://news.ycombinator.com/item?id=16012418).
 
 Thanks to Leah Alpert for providing suggestions on this post.
+
+***
+{{% subscribe %}}
 
 [^1]: I came across the [boilerplate generation code](https://docs.python.org/3/howto/clinic.html) while I was writing this post and it's super cool! A python-based C-preprocessor generates and maintains macros to do argument parsing and munging between Python and C
 

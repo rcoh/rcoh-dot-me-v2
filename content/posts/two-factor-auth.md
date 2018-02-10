@@ -96,6 +96,9 @@ Should you implement 2-factor auth, make sure your comparison method is safe fro
 
 If you want to find out when your 2-factor code will be your favorite number, you can use [this handy Python script](https://gist.github.com/rcoh/c4dc45825a322881a9c1b300d70c3941).
 
+***
+{{% subscribe %}}
+
 [^1]: Python and Ruby differ from C and Golang, for instance: https://github.com/golang/go/issues/448
 
 [^2]: Having Md5 as the default for hmac isn't a complete disaster, but it isn't great. According to [RFC 6151](https://tools.ietf.org/html/rfc6151) "attacks on HMAC-MD5 do not seem to indicate a practical vulnerability when used as a message authentication code," but, "for a new protocol design, a ciphersuite with HMAC-MD5 should not be included."
