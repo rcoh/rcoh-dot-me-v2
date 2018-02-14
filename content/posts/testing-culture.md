@@ -1,7 +1,7 @@
 ---
 title: "To foster a culture of testing, break local deployments"
 date: 2018-02-13T23:11:43-08:00
-draft: true
+draft: false
 prose: true
 tags: ["testing", "startups"]
 ---
