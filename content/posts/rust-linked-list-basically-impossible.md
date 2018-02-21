@@ -101,7 +101,7 @@ Same problem! When we set `head.next = next`, head took ownership, and we don't 
 
 There are 3 solutions I'm aware of:
 
-- Use `RefCell`, a runtime-checked borrow system (which still only works on nightly if you want to mutate) 
+- Use `RefCell`, a runtime-checked borrow system ~~(which still only works on nightly if you want to mutate)~~. `RefCell::borrow_mut` allows mutable borrowing of the cell's contents. 
 - Eschew safe Rust altogether and wade into the magical swamp of unsafe rust. 
 - Keep pointers as indices into a `Vec<>` instead of pointers, using something like the [indextree crate](https://github.com/saschagrunert/indextree)
 
