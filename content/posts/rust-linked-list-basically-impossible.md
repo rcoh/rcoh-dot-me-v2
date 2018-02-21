@@ -2,12 +2,13 @@
 title: "Why Writing a Linked List in Rust is Basically Impossible" 
 date: 2018-02-20T08:55:56-08:00
 draft: true
+tags: ["rust", "algorithms"]
 ---
 Before I start this post, let me preface it by saying that I'm not an experienced Rustacean by any means. Errata and corrections are appreciated. This post is aimed at helping other fledgling rust-learners avoid my mistake and make good choices about projects and Rust-friendly design decisions within them.
 
 I'd heard about Rust and it's inscrutable borrow checker for years, but after reading a few blog posts about compiler error improvements, I figured it might be user friendly enough to give it a try. I read a few chapters of the [book](https://doc.rust-lang.org/book/second-edition/) and then set about my first project: I wanted to build an [x-fast trie](https://en.wikipedia.org/wiki/X-fast_trie). I'll save the details of what is a really cool data structure for a later post, and cut to the chase: an x-fast trie is a trie with values at the leaves. To enable `\(O(1)\)` predecessor and successor searches once you have a leaf node, **the values are stored in a doubly linked list**. 
 
-I was coding along fairly successfully with a few small hiccups until I hit the doubly linked list. But when I started implementing it, the compiler let me know, in no uncertain terms that what I was doing wasn't ok. I tried and tried poking and prodding in different ways before I realized that I was trying to make Rust do something it fundamentally would not let me do. 
+I was coding along fairly successfully with a few small hiccups until I hit the doubly linked list. But when I started implementing it, the compiler let me know, in no uncertain terms that what I was doing wasn't ok. I tried and tried poking and prodding in different ways before I realized that I was trying to make Rust do something it fundamentally would not let me do.[^1]
 
 To explain why, consider a simple Node class for a doubly-linked list:
 ```rust
@@ -21,7 +22,7 @@ pub struct Node {
 Each node has a 64-bit value, an next, and an optional predecessor. Before I get into the parts of Rust that make this impossible, let me talk about the parts that make this awesome. It just turns out the awesome parts are impossible to provide in this case. 
 
 - `next` and `prev` must be `Optional` because there is no such thing as a null pointer in Rust. As the witnesser of many a segfault, this is awesome.
-- `next` and `prev` recursively refer to Nodes, which means we can't stack allocate our linked list. `Box`[https://doc.rust-lang.org/std/boxed/struct.Box.html], the simplest of Rust's "smart pointers" will heap allocate it's contents when `Box::new()` is called.
+- `next` and `prev` recursively refer to Nodes, which means we can't stack allocate our linked list. [`Box`](https://doc.rust-lang.org/std/boxed/struct.Box.html), the simplest of Rust's "smart pointers" will heap allocate it's contents when `Box::new()` is called.
 
 So far so good. The compiler happily accepts our `struct`. The problems start if we try to actually use it.
 
@@ -55,6 +56,7 @@ So far so good! But what if we want to print head:
 ```rust
 println!("{:?}", head)
 ```
+
 ```
   --> src/lib.rs:27:26
    |
@@ -90,10 +92,12 @@ Same problem! When we set `head.next = next`, head took ownership, and we don't 
   }
   ```
 
-    This helps until you want to mutate them. Borrowing is like a read-write lock for mutation. You can borrow immutably in multiple places, but if you want to borrow mutably, all your immutable borrowers must return the item. This isn't going to work since our list is composed of immutable borrows.
+This helps until you want to mutate them. Borrowing is like a read-write lock for mutation. You can borrow immutably in multiple places, but if you want to borrow mutably, all your immutable borrowers must return the item. This isn't going to work since our list is composed of immutable borrows.
+
 - Rust has `Rc`, a ref-counted pointer which seems like it could do the trick, but it prohibits mutation. This is obvious in hindsight: how could Rust let you have multiple references to something but also let you mutate them?
 
 There are 3 solutions I'm aware of:
+
 - Use `RefCell`, a runtime-checked borrow system (which still only works on nightly if you want to mutate) 
 - Eschew safe Rust altogether and wade into the magical swamp of unsafe rust. 
 - Keep pointers as indices into a `Vec<>` instead of pointers, like in the [indextree crate](https://github.com/saschagrunert/indextree)
@@ -110,3 +114,5 @@ Did I get something totally wrong? Please let me know, or just [send me a pull r
 
 ***
 {{% subscribe %}}
+
+[^1]: heres a footnote
