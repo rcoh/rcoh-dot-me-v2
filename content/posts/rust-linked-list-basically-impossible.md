@@ -104,9 +104,9 @@ If you want to follow someones detailed quest to write linked lists, [I found th
 
 In hindsight and with a deeper understanding, it's not surprising why a doubly linked list is so problematic. Each variable can only have _1_ owner. If the prev and next both hold pointers to a middle node, which is the owner? They can't both be the owner. If one is the owner, another can borrow. But Rust won't let you mutate while someone else is borrowing. In general, if you have loops in your object graph you're kind of out of luck.
 
-I find a bit of solace in the fact that implementing a data structure like this _without_ Rust is also quite tricky since you need to carefully keep track of when a node has no more references and can be freed. In the end, I gave up on Rust for this project and implemented it in Go instead. Never has coding in Go felt so effortless ;-). I'm getting started on my next learn-rust project, a port of my [Sumoshell](https://github.com/SumoLogic/sumoshell) tool. Since I ran into tons of race conditions in the initial implementation, I'm hopeful that Rust will help me get it right the first time.
+I find a bit of solace in the fact that implementing a data structure like this in a non-garbage collected language _without_ Rust is also quite tricky; you need to carefully keep track of when a node has no more references and can be freed. In the end, I gave up on Rust for this project and implemented it in Go instead. Never has coding in Go felt so effortless ;-). In the mean time, I'm getting started on my next learn-rust project, a port of my [Sumoshell](https://github.com/SumoLogic/sumoshell) tool. Since I ran into tons of race conditions in the initial implementation, I'm hopeful that Rust will help me get it right the first time.
 
-Did I get something totally wrong? Please let me know, or just [send me a pull request!]
+Did I get something totally wrong? Please let me know, or just [send me a pull request!](https://github.com/rcoh/rcoh-dot-me-v2/blob/master/content/posts/rust-linked-list-basically-impossible.md)
 
 ***
 {{% subscribe %}}
