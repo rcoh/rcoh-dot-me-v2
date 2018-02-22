@@ -19,10 +19,10 @@ pub struct Node {
 }
 ```
 
-Each node has a 64-bit value, and optional `next` and `prev` nodes. Before I get into the parts of Rust that make this impossible, let me talk about the parts that make this awesome. It just turns out the awesome parts are impossible to provide in this case. 
+Each node has a 64-bit value, and optional `next` and `prev` nodes. Before I get into the parts of Rust that make this impossible, let me talk about the parts that make Rust awesome. 
 
 - `next` and `prev` must be `Optional` because there is no such thing as a null pointer in Rust. As the witnesser of many a segfault, this is awesome.
-- `next` and `prev` recursively refer to `Node`, so we can't put them directly into the struct.[^1] [`Box`](https://doc.rust-lang.org/std/boxed/struct.Box.html), the simplest of Rust's "smart pointers" will heap allocate it's contents when `Box::new()` is called.
+- `next` and `prev` recursively refer to `Node`, so we can't put them directly into the struct.[^1] [`Box`](https://doc.rust-lang.org/std/boxed/struct.Box.html), the simplest of Rust's "smart pointers" will heap allocate its contents when `Box::new()` is called.
 
 So far so good. The compiler happily accepts our `struct`. The problems start if we try to actually use it.
 
