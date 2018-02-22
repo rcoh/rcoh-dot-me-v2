@@ -37,21 +37,21 @@ I won't attempt to describe these implications here -- there are too many and I 
 
 Our first try at implementing this will hit problems immediately.
 ```rust
-        // must be mut so we can modify it
-        let mut head = Node {
-            value: 5,
-            next: None,
-            prev: None,
-        };
-        let next = Node {
-            value: 6,
-            next: None,
-                         // next takes ownership of head!!!
-            prev: Some(Box::new(head)),
-        };
-        // I actually don't understand why the line below compiles. Since `head` was moved into the box,
-        // I'm not sure why I can mutate it.
-        head.next = Some(Box::new(next));
+// must be mut so we can modify it
+let mut head = Node {
+    value: 5,
+    next: None,
+    prev: None,
+};
+let next = Node {
+    value: 6,
+    next: None,
+                 // next takes ownership of head!!!
+    prev: Some(Box::new(head)),
+};
+// I actually don't understand why the line below compiles. 
+// Since `head` was moved into the box, I'm not sure why I can mutate it.
+head.next = Some(Box::new(next));
 ```
 So far so good! But what if we want to print head:
 ```rust
