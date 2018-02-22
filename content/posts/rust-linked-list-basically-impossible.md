@@ -1,10 +1,10 @@
 ---
-title: "Why Writing a Linked List in Rust is Basically Impossible" 
+title: "Why Writing a Linked List in (safe) Rust is So Damned Hard" 
 date: 2018-02-20T08:55:56-08:00
 draft: false
 tags: ["rust", "algorithms"]
 ---
-Before I start this post, let me preface it by saying that I'm not an experienced Rustacean by any means. Errata and corrections are appreciated. This post is aimed at helping other fledgling rust-learners avoid my mistake. First, by helping Rust learners pick good introductory projects that will fit naturally in idiomatic rust. Second, by helping Rust learners start building Rust-friendly design intuition.
+Before I start this post, let me preface it by saying that I'm not an experienced Rustacean by any means. The excellent foks at [/r/rust](https://www.reddit.com/r/rust/) gave a lot of helpful feedback and cleared up some misconceptions I had. Futher errata and corrections are appreciated. This post is aimed at helping other fledgling rust-learners avoid my mistake. First, by helping Rust learners pick good introductory projects that will fit naturally in idiomatic rust. Second, by helping Rust learners start building Rust-friendly design intuition.
 
 I'd heard about Rust and it's inscrutable borrow checker for years, but after reading a few blog posts about compiler error improvements, I figured it might be user-friendly enough to give it a try. I read a few chapters of the [book](https://doc.rust-lang.org/book/second-edition/) and then set about my first project: I wanted to build an [x-fast trie](https://en.wikipedia.org/wiki/X-fast_trie). Specifically, I was curious about the its performance in practice (hence the choice of a low-level language). I'll save the details of what is a really cool data structure for a later post, and cut to the chase: an x-fast trie is a trie with values at the leaves. To enable `\(O(1)\)` predecessor and successor searches once you have a leaf node, **the values are stored in a doubly linked list**. 
 
@@ -22,7 +22,7 @@ pub struct Node {
 Each node has a 64-bit value, and optional `next` and `prev` nodes. Before I get into the parts of Rust that make this impossible, let me talk about the parts that make this awesome. It just turns out the awesome parts are impossible to provide in this case. 
 
 - `next` and `prev` must be `Optional` because there is no such thing as a null pointer in Rust. As the witnesser of many a segfault, this is awesome.
-- `next` and `prev` recursively refer to Nodes, which means we can't stack allocate our linked list.[^1] [`Box`](https://doc.rust-lang.org/std/boxed/struct.Box.html), the simplest of Rust's "smart pointers" will heap allocate it's contents when `Box::new()` is called.
+- `next` and `prev` recursively refer to `Node`, so we can't put them directly into the struct. [`Box`](https://doc.rust-lang.org/std/boxed/struct.Box.html), the simplest of Rust's "smart pointers" will heap allocate it's contents when `Box::new()` is called.
 
 So far so good. The compiler happily accepts our `struct`. The problems start if we try to actually use it.
 
@@ -49,7 +49,8 @@ Our first try at implementing this will hit problems immediately.
                          // next takes ownership of head!!!
             prev: Some(Box::new(head)),
         };
-        // Does not _use_ head, just mutates it
+        // I actually don't understand why the line below compiles. Since `head` was moved into the box,
+        // I'm not sure why I can mutate it.
         head.next = Some(Box::new(next));
 ```
 So far so good! But what if we want to print head:
@@ -102,10 +103,10 @@ Same problem! When we set `head.next = next`, head took ownership, and we don't 
 There are 3 solutions I'm aware of:
 
 - Use `RefCell`, a runtime-checked borrow system ~~(which still only works on nightly if you want to mutate)~~. `RefCell::borrow_mut` allows mutable borrowing of the cell's contents. 
-- Eschew safe Rust altogether and wade into the magical swamp of unsafe rust. 
+- Eschew safe Rust altogether and wade into the magical swamp of unsafe Rust. This isn't nearly as big a deal as I initially thought -- even things like `Vec<>` are built on unsafe Rust. While it's not ideal, unsafe Rust is really just "normal mode" in most other programming languages. 
 - Keep pointers as indices into a `Vec<>` instead of pointers, using something like the [indextree crate](https://github.com/saschagrunert/indextree)
 
-If you want to follow someones detailed quest to write linked lists, [I found this book to be helpful](http://cglab.ca/~abeinges/blah/too-many-lists/book/).
+If you want to follow someones detailed quest to write linked lists I highly reccomend [Learning Rust With Entirely Too Many Linked Lists](http://cglab.ca/~abeinges/blah/too-many-lists/book/).
 
 ### Conclusion and Takeaways
 
@@ -118,4 +119,4 @@ Did I get something totally wrong? Please let me know, or just [send me a pull r
 ***
 {{% subscribe %}}
 
-[^1]: To stack allocate it, Rust would need to know exactly how much space it would take. Since it's a recursive datastructure, there is now way to know!
+[^1]: To stack allocate it, Rust would need to know exactly how much space it would take. Since it's a recursive datastructure, there is no way to know!
