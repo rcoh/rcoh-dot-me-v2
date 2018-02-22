@@ -19,10 +19,10 @@ pub struct Node {
 }
 ```
 
-Each node has a 64-bit value, and optional `next` and `prev` nodes. Before I get into the parts of Rust that make this impossible, let me talk about the parts that make this awesome. It just turns out the awesome parts are impossible to provide in this case. 
+Each node has a 64-bit value, and optional `next` and `prev` nodes. Before I get into the parts of Rust that make this impossible, let me talk about the parts that make Rust awesome. 
 
 - `next` and `prev` must be `Optional` because there is no such thing as a null pointer in Rust. As the witnesser of many a segfault, this is awesome.
-- `next` and `prev` recursively refer to `Node`, so we can't put them directly into the struct.[^1] [`Box`](https://doc.rust-lang.org/std/boxed/struct.Box.html), the simplest of Rust's "smart pointers" will heap allocate it's contents when `Box::new()` is called.
+- `next` and `prev` recursively refer to `Node`, so we can't put them directly into the struct.[^1] [`Box`](https://doc.rust-lang.org/std/boxed/struct.Box.html), the simplest of Rust's "smart pointers" will heap allocate its contents when `Box::new()` is called.
 
 So far so good. The compiler happily accepts our `struct`. The problems start if we try to actually use it.
 
@@ -35,7 +35,7 @@ To understand intuitively why this won't work, we have to understand ownership. 
 
 I won't attempt to describe these implications here -- there are too many and I don't understand most of them. The one that is important to note, however, is that if you pass a value directly to a function, the function (and the return value of the function, if there is one) now owns your value. You can't use it anymore.
 
-Our first try at implementing this will hit problems immediately.
+Our first try at implementing a linked list based on the struct above will hit problems immediately.
 ```rust
 // must be mut so we can modify it
 let mut head = Node {
@@ -106,7 +106,7 @@ There are 3 solutions I'm aware of:
 - Eschew safe Rust altogether and wade into the magical swamp of unsafe Rust. This isn't nearly as big a deal as I initially thought -- even things like `Vec<>` are built on unsafe Rust.[^2] While it's not ideal, unsafe Rust is really just "normal mode" in most other programming languages. 
 - Keep pointers as indices into a `Vec<>` instead of pointers, using something like the [indextree crate](https://github.com/saschagrunert/indextree)
 
-If you want to follow someones detailed quest to write linked lists I highly recommend [Learning Rust With Entirely Too Many Linked Lists](http://cglab.ca/~abeinges/blah/too-many-lists/book/).
+If you want to follow someone's detailed quest to write linked lists I highly recommend [Learning Rust With Entirely Too Many Linked Lists](http://cglab.ca/~abeinges/blah/too-many-lists/book/).
 
 ### Conclusion and Takeaways
 
