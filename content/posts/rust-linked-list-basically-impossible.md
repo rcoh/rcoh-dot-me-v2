@@ -103,7 +103,7 @@ Same problem! When we set `head.next = next`, head took ownership, and we don't 
 There are 3 solutions I'm aware of:
 
 - Use `RefCell`, a runtime-checked borrow system ~~(which still only works on nightly if you want to mutate)~~. `RefCell::borrow_mut` allows mutable borrowing of the cell's contents. 
-- Eschew safe Rust altogether and wade into the magical swamp of unsafe Rust. This isn't nearly as big a deal as I initially thought -- even things like `Vec<>` are built on unsafe Rust. While it's not ideal, unsafe Rust is really just "normal mode" in most other programming languages. 
+- Eschew safe Rust altogether and wade into the magical swamp of unsafe Rust. This isn't nearly as big a deal as I initially thought -- even things like `Vec<>` are built on unsafe Rust.[^2] While it's not ideal, unsafe Rust is really just "normal mode" in most other programming languages. 
 - Keep pointers as indices into a `Vec<>` instead of pointers, using something like the [indextree crate](https://github.com/saschagrunert/indextree)
 
 If you want to follow someones detailed quest to write linked lists I highly reccomend [Learning Rust With Entirely Too Many Linked Lists](http://cglab.ca/~abeinges/blah/too-many-lists/book/).
@@ -120,3 +120,4 @@ Did I get something totally wrong? Please let me know, or just [send me a pull r
 {{% subscribe %}}
 
 [^1]: To stack allocate it, Rust would need to know exactly how much space it would take. Since it's a recursive datastructure, there is no way to know!
+[^2]: Building on an unsafe foundation: https://www.youtube.com/watch?v=rTo2u13lVcQ
