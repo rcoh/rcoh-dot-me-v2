@@ -93,7 +93,7 @@ The key property of our layout strategy is that all "blocks" are laid out contig
 
 `$$F(N)=\frac{\log_2N}{\log_2B}=\log_BN$$`
 
-I'm dropping a some complexity in favor of simplicity; if this feels hand-wavy, you can find a more rigorous proof in the paper. Here's the important part: as `\(B\)` grows, the number of blocks we read shrinks. Success!
+I'm dropping some complexity in favor of simplicity; if this feels hand-wavy, you can find a more rigorous proof in the paper. Here's the important part: as `\(B\)` grows, the number of blocks we read shrinks. Success!
 
 
 
