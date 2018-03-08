@@ -30,3 +30,6 @@ Recently, my work has fallen into two categories:
   - SSL
   - Database migrations
   - Building developer culture of testing / code review etc.
+
+
+If this sounds good, drop my a line! `*@*.me` where `*` is rcoh, or send me a DM on [Twitter](https://twitter.com/russellrcohen).

@@ -5,7 +5,7 @@ draft: false
 tags: ["freelancing"]
 prose: true
 ---
-Two years ago in February 2014, frustrated and not feeling motivated by the 9 to 5, I quit my job. But, living in the Bay area is expensive, so I started freelancing. It's been a life changing experience -- I have control of my schedule, I have way less stress, and coding is fun again. It's definitely not for everyone. If you don't mind a little uncertainty and less choice on what you work on, the benefits far outweigh the downsides.
+Two years ago in February 2016, frustrated and not feeling motivated by the 9 to 5, I quit my job. But, living in the Bay area is expensive, so I started freelancing. It's been a life changing experience -- I have control of my schedule, I have way less stress, and coding is fun again. It's definitely not for everyone. If you don't mind a little uncertainty and less choice on what you work on, the benefits far outweigh the downsides.
 
 ### By the numbers
 
