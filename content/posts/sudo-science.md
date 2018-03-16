@@ -98,3 +98,6 @@ Success!
 
 ## Closing Thoughts
 I was actually really surprised by the `setuid` mechanism that enables `sudo` to work. In hindsight it seems reasonable, but I had no idea there was a filesystem bit that marked a program to be run as it's owner. It's a really cool mechanism! If your program is running as root, it's a good idea to run `setuid` to a non-root user as soon as possible to minimize the exploit surface.
+
+***
+{{% subscribe %}}
