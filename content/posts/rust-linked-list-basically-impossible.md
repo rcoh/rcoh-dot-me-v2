@@ -1,7 +1,8 @@
 ---
 title: "Why Writing a Linked List in (safe) Rust is So Damned Hard" 
 date: 2018-02-20T08:55:56-08:00
-draft: false
+draft: false,
+enableMath: true
 tags: ["rust", "algorithms"]
 ---
 Before I start this post, let me preface it by saying that I'm not an experienced Rustacean by any means. The excellent foks at [/r/rust](https://www.reddit.com/r/rust/) gave a lot of helpful feedback and cleared up some misconceptions I had. Futher errata and corrections are appreciated. This post is aimed at helping other fledgling rust-learners avoid my mistake. First, by helping Rust learners pick good introductory projects that will fit naturally in idiomatic rust. Second, by helping Rust learners start building Rust-friendly design intuition.

@@ -3,6 +3,7 @@ title: "My Favorite Algorithm: Linear Time Median Finding"
 date: 2018-01-15T22:07:18-08:00
 draft: false
 tags: ["python", "algorithms"]
+enableMath: true
 ---
 
 Finding the median in a list seems like a trivial problem, but doing so in linear time turns out to be tricky. In this post I'm going to walk through one of my favorite algorithms, the median-of-medians approach to find the median of a list in deterministic linear time. Although proving that this algorithm runs in linear time is a bit tricky, this post is targeted at readers with only a basic level of algorithmic analysis.

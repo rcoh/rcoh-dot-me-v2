@@ -3,6 +3,7 @@ title: "Maximize Cache Performance with this One Weird Trick: An Introduction to
 date: 2018-01-29T22:44:14-08:00
 draft: false
 tags: ["algorithms", "performance"]
+enableMath: true
 ---
 If you read my recent [post](/posts/postgres-indexes-under-the-hood) about Postgres you may have noted that Postgres operates primarily with fixed-size blocks of memory called "pages." By default, Postgres pages are 8KB. This number is tuned to match operating system page sizes which are tuned to match hardware cache sizes. If you were to run Postgres on hardware with different cache sizes than Postgres was tuned for, you may be able to pick a better page size.[^1]
 
