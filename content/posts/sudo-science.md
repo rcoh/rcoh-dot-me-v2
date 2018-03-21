@@ -22,7 +22,7 @@ Somehow I made it this far without actually understanding how `sudo` works. For 
    The magic bit here is "s" making it a setuid binary
 ```
 
-## Let's Make a (useless & dangerous) Sudo
+## Let's Make a (Useless & Dangerous) Sudo
 `setuid` is actually a bit subtle. To explore the subtleties, we'll go through a few false starts on our path to implement `sudo`.
 
 ### As a bash script
@@ -69,9 +69,9 @@ Still doesn't work! Turns out Linux _really_ doesn't want you messing around wit
 $ mount | grep "/home/russell"
 /home/.ecryptfs/russell/.Private on /home/russell type ecryptfs (rw,nosuid,nodev,...)
 ```
-~~I'm not aware of any specific reasons to mount your home directory as suid.~~ A reddit commenter pointed out that it's because my home directory is mounted on `encryptfs`. Because of this [CVE] (https://bugzilla.redhat.com/show_bug.cgi?id=CVE-2012-3409), `encryptfs` always mounts `nosuid`. In any case, it's certainly not a bad idea.
+~~I'm not aware of any specific reasons to mount your home directory as suid.~~ A reddit commenter pointed out that it's because my home directory is mounted on `encryptfs`. Because of [CVE-2012-3409] (https://bugzilla.redhat.com/show_bug.cgi?id=CVE-2012-3409), `encryptfs` always mounts `nosuid`. In any case, it's certainly not a bad idea.
 
-Any external media is also mounted `nosuid`. If you didn't, a user with sudo access could elevate their permissions by inserting a flashdrive with a `setuid` binary.
+Any external media is also mounted `nosuid`. If you didn't, a user without sudo access could elevate their permissions by inserting a flashdrive with a `setuid` binary.
 
 To work around `nosuid` restrictions, we need to put the binary in a directory _not_ mounted with setuid. On my computer at least we can use `/tmp`. `/tmp` is mounted on `/`, the root filesystem which doesn't have `setuid` restrictions.
 
