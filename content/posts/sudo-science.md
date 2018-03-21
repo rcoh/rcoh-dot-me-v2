@@ -2,7 +2,7 @@
 title: "Sudo Science"
 date: 2018-03-13T17:56:00-07:00
 draft: false
-tags: ["no-magic", "operating-systems", "internals"]
+tags: ["no-magic", "operating-systems", "internals", "security", "rust"]
 ---
 Somehow I made it this far without actually understanding how `sudo` works. For years, I've just typed `sudo`, typed my password, and revelled in my new, magical, root super powers. The other day and I finally looked into it -- to be honest, the mechanism is not at all what I expected. After going through the basics, we'll walk through creating our own version of `sudo`.
 
@@ -69,7 +69,7 @@ Still doesn't work! Turns out Linux _really_ doesn't want you messing around wit
 $ mount | grep "/home/russell"
 /home/.ecryptfs/russell/.Private on /home/russell type ecryptfs (rw,nosuid,nodev,...)
 ```
-I'm not aware of any specific reasons that require mounting your home directory as `nosuid`, but it seems like a generally good practice.
+~~I'm not aware of any specific reasons to mount your home directory as suid.~~ A reddit commenter pointed out that it's because my home directory is mounted on `encryptfs`. Because of this [CVE] (https://bugzilla.redhat.com/show_bug.cgi?id=CVE-2012-3409), `encryptfs` always mounts `nosuid`. In any case, it's certainly not a bad idea.
 
 Any external media is also mounted `nosuid`. If you didn't, a user with sudo access could elevate their permissions by inserting a flashdrive with a `setuid` binary.
 
@@ -79,7 +79,7 @@ To work around `nosuid` restrictions, we need to put the binary in a directory _
 Don't try this at home (or if you do, make sure to clean up after yourself)
 ```
 $  cp rustsudo /tmp 
-$  /tmp ls -l rustsudo 
+$  ls -l /tmp/rustsudo 
 -rwxr-xr-x 1 russell russell 5809968 Mar 16 11:16 rustsudo
 $  sudo chown root.root /tmp/rustsudo 
 [sudo] password for russell: 

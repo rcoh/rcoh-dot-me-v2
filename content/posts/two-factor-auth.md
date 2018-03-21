@@ -2,7 +2,7 @@
 title: "Demystifying Two Factor Auth"
 date: 2018-01-06T23:36:23-08:00
 draft: false
-tags: ["no-magic", "python"]
+tags: ["no-magic", "python", "security"]
 ---
 I always wondered how Google Authenticator style 2-factor codes worked. The process of going from QR code to rotating 6-digit pin seemed
 a bit magical. A few days ago, my curiosity found itself coupled with some free time. Here's what I found:
