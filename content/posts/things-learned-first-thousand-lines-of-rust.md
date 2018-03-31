@@ -159,7 +159,7 @@ I admit I was of two minds on this. Initially, it was infuriating, mostly becaus
 
 ## Conclusions
 
-At the end of the day, I really enjoyed writing [angle grinder](https://github.com/rcoh/angle-grinder) in Rust, significantly more so than when I first wrote `Sumoshel` as a project to learn Go. I just spent more time solving coding problems than I spent solving language problems. When I first wrote it in Go, I spent a lot of time surprised and confused by Go's behavior. I'm not sure I'd pick it for writing a web service just yet. The posts I've read about people's experience seemed to contain a lot more pain than I really want to experience. But for a writing non-trivial CLI apps, I think it's going to be my go-to choice going forward.
+At the end of the day, I really enjoyed writing [angle grinder](https://github.com/rcoh/angle-grinder) in Rust, significantly more so than when I first wrote `Sumoshell` as a project to learn Go. I just spent more time solving coding problems than I spent solving language problems. When I first wrote it in Go, I spent a lot of time surprised and confused by Go's behavior. I'm not sure I'd pick it for writing a web service just yet. The posts I've read about people's experience seemed to contain a lot more pain than I really want to experience. But for a writing non-trivial CLI apps, I think it's going to be my go-to choice going forward.
 
 
 [^1]: Don't get me wrong, I'm as pro-JVM as anyone, it just really sucks to wait 1-2 seconds to start up a CLI app.
