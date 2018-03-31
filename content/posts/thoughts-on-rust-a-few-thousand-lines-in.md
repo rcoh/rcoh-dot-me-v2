@@ -3,6 +3,8 @@ title: "Thoughts on Rust, a few thousand lines in"
 date: 2018-03-24T12:56:00-07:00
 draft: false
 tags: ["rust", "scala", "python"]
+aliases:
+ - /posts/things-learned-first-thousand-lines-of-rust/
 ---
 To say my [first foray](/posts/rust-linked-list-basically-impossible) into Rust was a frustrating struggle would be an understatement. I picked a terrible first project that left me neck deep in Rust's trickiest areas right off the bat. I was excited to try again. A few years ago I wrote [Sumoshell](https://github.com/SumoLogic/sumoshell), a CLI App for log analysis. I'd wanted to improve it for a while, so porting it to Rust seemed like a nice way to kill two birds with one stone. Like Go, Rust can compile statically linked linux binaries which makes it ideal for distributing CLI apps; indeed CLI app support is a [priority](https://internals.rust-lang.org/t/announcing-the-cli-working-group/6872) for Rust. Before I get into the rest of the post, [here's the end result](https://github.com/rcoh/angle-grinder).
 
