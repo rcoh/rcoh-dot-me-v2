@@ -1,5 +1,5 @@
 ---
-title: "Things I learned writing my first few thousand lines of Rust"
+title: "Thoughts on Rust, a few thousand lines in"
 date: 2018-03-24T12:56:00-07:00
 draft: false
 tags: ["rust", "scala", "python"]
