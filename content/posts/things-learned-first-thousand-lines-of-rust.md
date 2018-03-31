@@ -34,6 +34,9 @@ Across the board, the docs are clear, easy to read, and, in another stroke of pr
 
 **Watch out for stale docs! A lot of google searches lead you to the first edition of the Rust book. It isn't incorrect (to my knowledge), but there is sometimes a better way.**[^docs]
 
+###  Cargo Fmt
+Any language in 2018 that doesn't have 1-true-way to be formatted is missing out. 
+
 ### Variable shadowing encouraged
 Unlike nearly every language I've ever used, Rust actually _encourages_ variable shadowing. I thought this was a really interesting and pragmatic design decision. It avoids code like:
 
