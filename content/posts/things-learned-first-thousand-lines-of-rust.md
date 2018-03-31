@@ -4,15 +4,15 @@ date: 2018-03-24T12:56:00-07:00
 draft: false
 tags: ["rust", "scala", "python"]
 ---
-To say my [first foray](/posts/rust-linked-list-basically-impossible) into Rust was a frustrating struggle would be an understatement. I picked a terrible first project that left me neck deep in Rust's trickiest areas right off the bat. I was excited to try again. A few years ago I wrote [Sumoshell](https://github.com/SumoLogic/sumoshell), a CLI-App for log analysis. I'd wanted to improve it for a while, so porting it to Rust seemed like a nice way to kill two birds with one stone. Like Go, Rust can compile statically linked linux binaries which makes it ideal for distributing CLI apps; indeed CLI App support is a [priority](https://internals.rust-lang.org/t/announcing-the-cli-working-group/6872) for Rust. Before I get into the rest of the post, [here's the end result](https://github.com/rcoh/angle-grinder).
+To say my [first foray](/posts/rust-linked-list-basically-impossible) into Rust was a frustrating struggle would be an understatement. I picked a terrible first project that left me neck deep in Rust's trickiest areas right off the bat. I was excited to try again. A few years ago I wrote [Sumoshell](https://github.com/SumoLogic/sumoshell), a CLI App for log analysis. I'd wanted to improve it for a while, so porting it to Rust seemed like a nice way to kill two birds with one stone. Like Go, Rust can compile statically linked linux binaries which makes it ideal for distributing CLI apps; indeed CLI app support is a [priority](https://internals.rust-lang.org/t/announcing-the-cli-working-group/6872) for Rust. Before I get into the rest of the post, [here's the end result](https://github.com/rcoh/angle-grinder).
 
 ![Angle grinder demo](/images/agrind-demo.gif)
 
 
-With a few small hiccups, my second try at learning Rust was a real a joy. It combines the expressiveness and type system I love from Scala with the small memory footprint and performance you get from compiling directly to a low level without a runtime.[^1] I saw a lot of pragmatism in the design of the language and the standard library, more so than I've seen in other languages. I should caveat this with a note that I haven't tried to write macros or use `Futures` yet, [two major pain-points](https://brandur.org/fragments/rust-brick-walls).
+With a few small hiccups, my second try at learning Rust was a real joy. It combines the expressiveness and type system I love from Scala with the small memory footprint and performance you get from compiling directly to a low level without a runtime.[^1] I saw a lot of pragmatism in the design of the language and the standard library, more than I've seen in other languages. I should caveat this with a note that I haven't tried to write macros or use `Futures` yet, [two major pain-points](https://brandur.org/fragments/rust-brick-walls).
 
 ## Things That Were Awesome
-At nearly every turn that I've thought, "wow it would be great if...", Rust has a well thought off solution that strikes just the right balance between idealism and pragmatism.
+Nearly every time I've thought, "wow it would be great if...", Rust has a well thought out solution that strikes just the right balance between idealism and pragmatism.
 
 ### Great Docs
 The Rust documentation is some of the best technical writing I've ever read. After writing code like:
@@ -34,8 +34,8 @@ Across the board, the docs are clear, easy to read, and, in another stroke of pr
 
 **Watch out for stale docs! A lot of google searches lead you to the first edition of the Rust book. It isn't incorrect (to my knowledge), but there is sometimes a better way.**[^docs]
 
-###  Cargo Fmt
-Any language in 2018 that doesn't have 1-true-way to be formatted is missing out. 
+### Cargo Fmt
+`cargo fmt` is the autoformatting module built in to Rust. While it's not quite as perfect as `go fmt`, it's coming along. Any language in 2018 that doesn't have 1-true-way to be formatted is missing out. 
 
 ### Variable shadowing encouraged
 Unlike nearly every language I've ever used, Rust actually _encourages_ variable shadowing. I thought this was a really interesting and pragmatic design decision. It avoids code like:
@@ -96,12 +96,12 @@ let another: Vec<u64> = some_vec.iter().map(|x|x + 5).collect();
 ```
 But I appreciate the trade off. In Scala, laziness vs. nonlaziness in the standard library collections has been a footgun for years.
 
-The type system of Rust was plenty for this project, even without higher kinded types. Scala's type system is fine, but I frequently end up needing type classes which are a bit of a kludge in Scala. Rust brings type classes (called `Traits` in Rust) as _the way_ of code reuse. I feel pretty strongly that the ad-hoc polymorphism offered by type classes is the best option in terms of leading people into the [pit of success](https://blog.codinghorror.com/falling-into-the-pit-of-success/).
+The type system of Rust was plenty for this project, even without higher-kinded types. Scala's type system is fine, but I frequently end up needing type classes which are a bit of a kludge in Scala. Rust brings type classes (called `Traits` in Rust) as _the way_ of code reuse. I feel pretty strongly that the ad-hoc polymorphism offered by type classes is the best option in terms of leading people into the [pit of success](https://blog.codinghorror.com/falling-into-the-pit-of-success/).
 
 Compile times in Rust aren't great -- it takes about 10 seconds to compile angle grinder with 1800 lines of Rust, but they certainly beat Scala.
 
 ## Things that might be awesome in the future
-Some things were a little rougher around the edges. I'm including this section not as a criticism, but rather as a heads of things to watch out for new Rustaceans.
+Some things were a little rougher around the edges. I'm including this section not as a criticism, but rather as a heads-up of things to watch out for new Rustaceans.
 
 ### Crates Don't Have Great SEO
 TLDR: If you're looking for a crate, search for it on [https://crates.io](https://crates.io). Many great crates don't show up Google! Another side note: A lot of great, well loved, crates don't have a lot of Github stars.
@@ -114,10 +114,10 @@ Coming from Python and Scala, where googling "Python thing I want" almost always
   | pct90(response_ms) by status_code
 ```
 
- For this use case, a streaming, approximate percentile implementation is key so you don't leak memory. Googling `Rust percentile` gives you a few options, but none of them are great.[^3] I actually ended up finding a much better crate [quantiles](https://crates.io/crates/quantiles) when I searched for [CKMS](http://ieeexplore.ieee.org/document/1410103/?tp=&arnumber=1410103&url=http:%2F%2Fieeexplore.ieee.org%2Fxpls%2Fabs_all.jsp%3Farnumber%3D1410103), a popular streaming percentile algorithm. But if I had just [searched crates.io](https://crates.io/search?q=percentile), I would have found it right away. 
+ For angle-grinder, a streaming & constant memory implementation of percentile is required to avoid leaking memory. Googling `Rust percentile` gives you a few options, but none of them are great.[^3] I actually ended up finding a much better crate [quantiles](https://crates.io/crates/quantiles) when I searched for [CKMS](http://ieeexplore.ieee.org/document/1410103/?tp=&arnumber=1410103&url=http:%2F%2Fieeexplore.ieee.org%2Fxpls%2Fabs_all.jsp%3Farnumber%3D1410103), a popular streaming percentile algorithm. But if I had just [searched crates.io](https://crates.io/search?q=percentile), I would have found it right away. 
 
 ### Macro errors are the worst.
-Angle grinder is essentially an extremely simple functional programming language wrapped in pretty CLI App. So, naturally, it needs to parse the aforementioned programing language. Being familiar with parser-combinator style parsing from Scala, I decided to use [Nom](https://github.com/geal/nom), a similar library for Rust. Nom is based on macros. This is great when it allows you to write a lot less code. But it's less nice when you forget an `>` and get an error like:
+Angle grinder is essentially an extremely simple functional programming language wrapped in a pretty CLI app. So, naturally, it needs to parse the aforementioned programing language. Being familiar with parser-combinator style parsing from Scala, I decided to use [Nom](https://github.com/geal/nom), a similar library for Rust. Nom is based on macros. This is great when it allows you to write a lot less code. But it's less nice when you forget an `>` and get an error like:
 ```rust
 error: no rules expected the token `i1`
   --> src/lang.rs:95:1
@@ -157,10 +157,12 @@ error[E0277]: the trait bound `f64: std::cmp::Ord` is not satisfied
 ```
 I admit I was of two minds on this. Initially, it was infuriating, mostly because my specific use-case at the time didn't enable me to use the escape hatch suggested on the internet, `partial_cmp(...).unwrap_or(Ordering::Less)`. But I think this is a better choice than Python's surprising behavior. I'm looking forward to progress being made on [#1249](https://github.com/rust-lang/rfcs/issues/1249), which proposes adding wrapper types that implement an IEEE complete order on floats. At the end of the day, though, this is the kind of property that can make it frustrating when first getting to know a language.
 
-## Conclusions
+## Parting Thoughts
 
 At the end of the day, I really enjoyed writing [angle grinder](https://github.com/rcoh/angle-grinder) in Rust, significantly more so than when I first wrote `Sumoshell` as a project to learn Go. I just spent more time solving coding problems than I spent solving language problems. When I first wrote it in Go, I spent a lot of time surprised and confused by Go's behavior. I'm not sure I'd pick it for writing a web service just yet. The posts I've read about people's experience seemed to contain a lot more pain than I really want to experience. But for a writing non-trivial CLI apps, I think it's going to be my go-to choice going forward.
 
+***
+{{% subscribe %}}
 
 [^1]: Don't get me wrong, I'm as pro-JVM as anyone, it just really sucks to wait 1-2 seconds to start up a CLI app.
 [^2]: One semi-answer is that nightly Rust can show you the backtrace where this failed. This might help if your the macro author, but as a macro user, I can't see this being too helpful.
