@@ -100,7 +100,7 @@ But I appreciate the trade off. In Scala, laziness vs. nonlaziness in the standa
 
 The type system of Rust was plenty for this project, even without higher-kinded types. Scala's type system is fine, but I frequently end up needing type classes which are a bit of a kludge in Scala. Rust brings type classes (called `Traits` in Rust) as _the way_ of code reuse. I feel pretty strongly that the ad-hoc polymorphism offered by type classes is the best option in terms of leading people into the [pit of success](https://blog.codinghorror.com/falling-into-the-pit-of-success/).
 
-Compile times in Rust aren't great -- it takes about 5 seconds to compile angle grinder with 1800 lines of Rust. I'm hopeful that with incremental compilation currently in nightly, this will improve.
+Compile times in Rust aren't great -- it takes about 5 seconds to compile angle grinder with 1800 lines of Rust. Incremental compilation has already landed in stable, but I haven't noticed a big different in practice, even when I only change a couple of lines. `cargo check` & `cargo watch` are a saving grace here, but they only help when you're iterating on compiler errors instead of test failures.
 
 ## Things that might be awesome in the future
 Some things were a little rougher around the edges. I'm including this section not as a criticism, but rather as a heads-up of things to watch out for new Rustaceans.
