@@ -27,39 +27,33 @@ Given these two things, the system scheduling threads onto the CPU has enough in
 
 Getting back to our original question, why can you have so many more Goroutines?
 
-### Answer 1: Because the JVM uses operating system threads
-Although, it's not required by the spec, all modern, general purpose JVMs that I'm aware of delegate threading to operating system threads on all platforms where this is possible. Going forward, I'll use the phrase "user space threads" to refer to threads that are scheduled by the language instead of by the kernel/OS. Threads implemented by the operating system have two properties that drastically limit how many of them can exist: 
+### The JVM uses operating system threads
+Although, it's not required by the spec, all modern, general purpose JVMs that I'm aware of delegate threading to operating system threads on all platforms where this is possible. Going forward, I'll use the phrase "user space threads" to refer to threads that are scheduled by the language instead of by the kernel/OS. Threads implemented by the operating system have two properties that drastically limit how many of them can exist. In fact, no solution that maps language threads 1:1 with operating system threads can support massive concurrency. Golang deals with both of these issues in pretty cool ways.
 
-#### Context Switching Delay
-
-**Using operating system threads caps you in the double digit thousands, simply from context switching delay**.
-
-Because the JVM uses operating system threads, it relies on the operating system kernel to schedule them. The operating system has a list of all the running processes and threads, and attempts to give them each a "fair" share of time running on the CPU.[^nice] When the kernel switches from one thread to another, it has a significant amount of work do. The new thread or process running must be started with a view of world that abstracts away the fact that other threads are running on the same CPU. I won't the get into the nitty gritty here, but you can [read more](https://en.wikipedia.org/wiki/Context_switch) if you're curious. The critical takeaway is that switching contexts will take on the order of 1-100µ seconds. This may not seem like much, but at a fairly realistic 10µ seconds per switch, if you want to schedule each thread at least once per second, you'll only be able to run about 100k threads on 1 core. And this doesn't actually give the threads time to do any useful work.
-
-#### Fixed Stack Size
+#### In the JVM: Fixed Stack Size
 
 **Using operating system threads incurs a constant, large, memory cost per thread**
 
 The second major problem with operating system threads comes because each OS thread has its own fixed-size stack. Though the size is configurable, in a 64-bit environment, the JVM defaults to a 1MB stack per thread. You can make the default stack size smaller, but you tradeoff memory usage with increased risk of stack overflow. The more recursion in your code, the more likely you are to hit stack overflow. If you leave it at the default, 1k threads will use almost 1GB of RAM! RAM is cheap these days, but almost no one has the terabyte of ram you'd need to run a million threads with this machinery.
 
-### How Go Does it Differently
-
-No solution that maps language threads 1:1 with operating system threads can support massive concurrency. Golang deals with both of these issues in pretty cool ways.
-
-#### Run multiple Goroutines on a single OS thread
-Golang effectively implements its own scheduler that allows many Goroutines to run on the same OS thread. Even if Go ran the same context switching code as the kernel, it would save a significant amount of time by avoiding the need to switch into ring-0 to run the kernel and back again. Go has more tricks up its sleeve which we'll get to in a little bit.
-
-
-#### Dynamically Sized Stacks
+#### How Go does it differently: Dynamically Sized Stacks
 Golang prevents large (mostly unused) stacks running the system out of memory with a clever trick: Go's stacks are dynamically sized, growing and shrinking with the amount of data stored. This isn't a trivial thing to do, and the design has gone through a [couple](https://blog.cloudflare.com/how-stacks-are-handled-in-go/) [of](https://groups.google.com/forum/#!topic/golang-dev/i7vORoJ3XIw) [iterations](https://docs.google.com/document/d/1wAaf1rYoM4S4gtnPh0zOlGzWtrZFQ5suE8qr2sD8uWQ/pub).[^2] While I'm not going to get into the internal details here (they're more than enough for their own posts and others have written about it at length), the upshot is that a new goroutine will have a stack of only about 4KB. With 4KB per stack, you can put 2.5 million goroutines in a gigabyte of RAM -- a huge improvement over Java's 1MB per thread.
 
-### Answer 2: Because Java doesn't know what threads to run 
-Even if Java implemented dynamically sized stacks and brought threads to user space, it still wouldn't be able to support millions of threads. Suppose for a minute that in your new system, switching between new threads takes only 100 nanoseconds. Even if all you did was context switch, you could only run about a million threads if you wanted to schedule each thread ten times per second. More importantly, you'd be maxing out your CPU to do so. Supporting truly massive concurrency requires one more optimization: Only schedule a thread when you know it can do useful work! If you're running that many threads, only a handful can be be doing useful work anyway. Go facilitates this by integrating channels and the scheduler. If a goroutine is waiting on a empty channel, the scheduler can see that and it won't run the Goroutine. Go goes one step further and actually sticks the mostly-idle goroutines on their own operating system thread. This way the (hopefully much smaller) number of active goroutines can be round-robined by a thread while the potentially millions of mostly-sleeping goroutines can be tended to separately. This helps keep latency down.
+#### In the JVM: Context Switching Delay
 
-Unless Java added language features that the scheduler could observe, this sort of thing is impossible. However, you can build a runtime schedulers in "user space" that are aware of when a thread can do work.[^3] 
+**Using operating system threads caps you in the double digit thousands, simply from context switching delay**.
+
+Because the JVM uses operating system threads, it relies on the operating system kernel to schedule them. The operating system has a list of all the running processes and threads, and attempts to give them each a "fair" share of time running on the CPU.[^nice] When the kernel switches from one thread to another, it has a significant amount of work do. The new thread or process running must be started with a view of world that abstracts away the fact that other threads are running on the same CPU. I won't the get into the nitty gritty here, but you can [read more](https://en.wikipedia.org/wiki/Context_switch) if you're curious. The critical takeaway is that switching contexts will take on the order of 1-100µ seconds. This may not seem like much, but at a fairly realistic 10µ seconds per switch, if you want to schedule each thread at least once per second, you'll only be able to run about 100k threads on 1 core. And this doesn't actually give the threads time to do any useful work.
+
+#### How Go does it differently: Run multiple Goroutines on a single OS thread
+Golang implements its own scheduler that allows many Goroutines to run on the same OS thread. Even if Go ran the same context switching code as the kernel, it would save a significant amount of time by avoiding the need to switch into ring-0 to run the kernel and back again. But that's just table stakes. To actually support 1 million goroutines, Go needs to do something much more sophisticated.
+
+Even if Java brought threads to user space, it still wouldn't be able to support millions of threads. Suppose for a minute that in your new system, switching between new threads takes only 100 nanoseconds. Even if all you did was context switch, you could only run about a million threads if you wanted to schedule each thread ten times per second. More importantly, you'd be maxing out your CPU to do so. Supporting truly massive concurrency requires another optimization: Only schedule a thread when you know it can do useful work! If you're running that many threads, only a handful can be be doing useful work anyway. Go facilitates this by integrating channels and the scheduler. If a goroutine is waiting on a empty channel, the scheduler can see that and it won't run the Goroutine. Go goes one step further and actually sticks the mostly-idle goroutines on their own operating system thread. This way the (hopefully much smaller) number of active goroutines can be round-robined by a thread while the potentially millions of mostly-sleeping goroutines can be tended to separately. This helps keep latency down.
+
+Unless Java added language features that the scheduler could observe, supporting intelligent scheduling would be impossible. However, you can build runtime schedulers in "user space" that are aware of when a thread can do work. This forms the basis for frameworks like Akka that can support millions of actors[^3] 
 
 ### Closing Thoughts
-Transitioning from a model using operating system threads to a model using lightweight, user space threads has happened over and over again and will probably continue to happen. For use cases where a high degree of concurrency is required, it's simply the only option. However, it doesn't come without considerable complexity. If Go opted for OS threads instead of their own scheduler and growable-stack scheme, they would shave thousands of lines off the runtime. Using Python's `gevent` to achieve similar behavior is a terrifying leap of faith that everything will be monkeypatched correctly.
+Transitioning from a model using operating system threads to a model using lightweight, user space threads has happened over and over again and will probably continue to happen. For use cases where a high degree of concurrency is required, it's simply the only option. However, it doesn't come without considerable complexity. If Go opted for OS threads instead of their own scheduler and growable-stack scheme, they would shave thousands of lines off the [runtime](https://github.com/golang/go/blob/d9b006a7057d4666cb4fa9c421f2360ef3994b0f/src/runtime/proc.go). Using Python's `gevent` to achieve similar behavior is a terrifying leap of faith that everything will be monkeypatched correctly.
 
 But, thousands use both in production every day. For many use cases, it's simply a better model. The complexity can be abstracted away by language and library writers, and software engineers can write massively concurrent programs.
 
