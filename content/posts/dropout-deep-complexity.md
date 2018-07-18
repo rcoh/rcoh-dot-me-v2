@@ -1,7 +1,7 @@
 ---
 title: "Dropout and the Deep Complexity of Neural Networks"
 date: 2018-07-12T11:01:16-07:00
-draft: true
+draft: false 
 enableMath: true
 tags: ["deep-learning"]
 ---
