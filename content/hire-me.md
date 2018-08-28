@@ -17,8 +17,8 @@ Software-wise, I do essentially everything, but I specialize in backend infrastr
 Recently, my work has fallen into two categories:
 
 - Help design and ship backend projects
-  - I helped [Nylas](https://nylas.com) deploy a new, lower-latency webhooks delivery infrastructure
-  - I worked on the Kubernetes deployment system for [Kensho](https://kensho.com)
+  - I helped [Nylas](https://nylas.com) deploy a [new, lower-latency webhooks delivery infrastructure](https://www.nylas.com/blog/-speeding-up-our-webhooks-system-60x)
+   - I worked on the Kubernetes deployment system for [Kensho](https://kensho.com)
   - I built a DSL that compiles to Spark for [LogicHub](https://www.logichub.com/)
   - I helped a health startup use crypto properly
 
