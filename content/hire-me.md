@@ -7,8 +7,8 @@ If you're interested in hiring me for a contracting engagement, send me an email
 
 I'm currently open to:
 
-* Engagements from 1 week to 3 months
-* Remote or onsite in the SF Bay Area
+* Engagements from 1 day to 3 months
+* Onsite in the SF Bay Area or remote
 
 ### Recent work
 
@@ -17,19 +17,20 @@ Software-wise, I do essentially everything, but I specialize in backend infrastr
 Recently, my work has fallen into two categories:
 
 - Help design and ship backend projects
-  - I helped [Nylas](https://nylas.com) deploy a [new, lower-latency webhooks delivery infrastructure](https://www.nylas.com/blog/-speeding-up-our-webhooks-system-60x)
-   - I worked on the Kubernetes deployment system for [Kensho](https://kensho.com)
+  - I helped [ReturnToCorp](https://returntocorp.com) migrate to Kubernetes
+  - I helped [Nylas](https://nylas.com) architect, code, and ship a [new webhooks delivery infrastructure that cut latency by 60x](https://www.nylas.com/blog/-speeding-up-our-webhooks-system-60x)
+  - I worked on the Kubernetes deployment system for [Kensho](https://kensho.com)
   - I built a DSL that compiles to Spark for [LogicHub](https://www.logichub.com/)
-  - I helped a health startup use crypto properly
-
+  - I helped a health startup use crypto properly and make key architectural decisions
 
 - Help _very early_ startups establish their tech stack while they're working on making their first technical hires. I've done it many times, so I know how to get it right the first time. I typically help with things like:
+  - Design initial architecture, aiming for simplicity and scalability
   - Setup Ansible/Terraform
   - Setup Kubernetes/Docker infrastructure
   - Continuous Integration / Deployment
   - SSL
-  - Database migrations
-  - Building developer culture of testing / code review etc.
+  - Setup database migrations the right way
+  - Establish a developer culture of testing / code review and trust
 
 
 If this sounds good, drop me a line! `*@*.me` where `*` is rcoh, or send me a DM on [Twitter](https://twitter.com/russellrcohen).
