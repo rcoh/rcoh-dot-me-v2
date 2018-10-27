@@ -3,6 +3,9 @@ title: "Why you can have millions of Goroutines but only thousands of Java Threa
 date: 2018-04-12T14:28:46-07:00
 draft: false
 tags: ["language-internals", "golang", "scala", "java"]
+translations:
+  chinese: http://www.infoq.com/cn/articles/a-million-go-routines-but-only-1000-java-threads
+  japanese: https://mahata.gitlab.io/post/2018-10-15-goroutines-vs-java-threads/
 ---
 Many seasoned engineers working in JVM based languages have seen errors like this:
 ```
