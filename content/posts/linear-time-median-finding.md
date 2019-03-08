@@ -12,7 +12,7 @@ Finding the median in a list seems like a trivial problem, but doing so in linea
 
 ### Finding the median in O(n log n)
 
-The most straightforward way to find the median is to sort the list and just pick the median by its index. The fastest comparison-based sort is `O(n log n)`, so that dominates the runtime.[^2][^3]
+The most straightforward way to find the median is to sort the list and just pick the median by its index. The fastest comparison-based sort is `\(O(n \log n)\)`, so that dominates the runtime.[^2][^3]
 
 ```python
 def nlogn_median(l):
@@ -116,7 +116,7 @@ def quickselect(l, k, pivot_fn):
         return quickselect(highs, k - len(lows) - len(pivots), pivot_fn)
 ```
 
-Quickselect excels in the real world: It has almost no overhead and operates in average `O(n)`. Let's prove it.
+Quickselect excels in the real world: It has almost no overhead and operates in average `\(O(n)\)`. Let's prove it.
 
 #### Proof of Average O(n)
 On average, the pivot will split the list into 2 approximately equal-sized pieces. Therefore, each subsequent recursion operates on 1/2 the data of the previous step.
@@ -129,9 +129,9 @@ Quickselect gets us linear performance, but only in the average case. What if we
 
 ### Deterministic O(n)
 
-In the section above, I described quickselect, an algorithm with _average_ `O(n)` performance. Average in this context means that, _on average_, the algorithm will run in `O(n)`. Technically, you could get extremely unlucky: at each step, you could pick the largest element as your pivot. Each step would only remove one element from the list and you'd actually have `O(n^2)` performance instead of `O(n)`.
+In the section above, I described quickselect, an algorithm with _average_ `\(O(n)\)` performance. Average in this context means that, _on average_, the algorithm will run in `\(O(n)\)`. Technically, you could get extremely unlucky: at each step, you could pick the largest element as your pivot. Each step would only remove one element from the list and you'd actually have `\(O(n^2)\)` performance instead of `\(O(n)\)`.
 
-With that in mind, what follows is an algorithm for _picking pivots_. Our goal will be to pick a pivot in linear time that removes enough elements in the worst case to provide `O(n)` performance when used with quickselect. This algorithm was originally developed in 1973 by the mouthful of Blum, Floyd, Pratt, Rivest, and Tarjan. If my treatment is unsatisfying, their [1973 paper](http://people.csail.mit.edu/rivest/pubs/BFPRT73.pdf) will certainly be sufficient. Rather than walk through the algorithm in prose, I've heavily annotated my Python
+With that in mind, what follows is an algorithm for _picking pivots_. Our goal will be to pick a pivot in linear time that removes enough elements in the worst case to provide `\(O(n)\)` performance when used with quickselect. This algorithm was originally developed in 1973 by the mouthful of Blum, Floyd, Pratt, Rivest, and Tarjan. If my treatment is unsatisfying, their [1973 paper](http://people.csail.mit.edu/rivest/pubs/BFPRT73.pdf) will certainly be sufficient. Rather than walk through the algorithm in prose, I've heavily annotated my Python
 implementation below:
 
 ```python
@@ -183,25 +183,40 @@ Let's prove why the median-of-medians is a good pivot. To help, consider this vi
 
 ![Pivot selection visualization](/images/median-of-medians.svg)
 
-The red oval denotes the medians of the chunks, and the center circle denotes the median-of-medians. Recall that we want our pivot to split the list as evenly as possible. In the worst possible case, every element in the blue rectangle (top left) will be less than or equal to our pivot. The top right quadrant contains 3/5 of half of the rows -- `3/5*1/2=3/10`. So, we'll always drop at least 30% of the rows at each step.
+The red oval denotes the medians of the chunks, and the center circle denotes the median-of-medians. Recall that we want our pivot to split the list as evenly as possible. Let's consider the worst possible case -- the case where are pivot is as close as possible to the beginning of the list (without loss of generality, this argument symmetrically applies to the end of the list as well.)
 
-But is dropping 30% of the elements at each step sufficient? At each step, our algorithm must do:
+Consider the four quadrants (which overlap, including the center column (when the number of columns is odd) & middle row):
+
+- Top left: Every item in this quadrant is strictly less than the median
+- Bottom left: These items may be bigger (or smaller!) than the median
+- Top right: These items may be bigger (or smaller!) than the median
+- Bottom right: Every item in this quadrant is strictly greater than the median
+
+Out of these four two quadrants are useful because they allow us to make assertions about their contents (top left, bottom right) and two are not (bottom left, top right).
+
+Now lets return to our original task, finding the worst possible case where our pivot falls as early in the list as possible. As I argued above, at a minimum, every item in the top left is strictly less than our pivot. How many items are there as a function of `\(n\)`? Each column has 5 items, of which we'll take 3; we're taking half of the columns, thus: 
+
+$$f(n)=\frac{3}{5}*\frac{1}{2}n=\frac{3}{10}n$$
+
+Therefore, at each step, at minimum, we will remove, at minimum, 30% of the rows.
+
+But is dropping 30% of the elements at each step sufficient? It's worse than the 50% we achieved in the randomized algorithm. At each step, our algorithm must do:
 
 - O(n) work to partition the elements
-- Solve 1 subproblem 7/10 the size of the original to recurse
 - Solve 1 subproblem 1/5 the size of the original to compute the median of medians
+- Solve 1 subproblem 7/10 the size of the original as the recursive step
 
-This yields the following equation for the total runtime, `T(n)`:
+This yields the following equation for the total runtime, `\(T(n)\)`:
 
-$$T(n)=T(\frac{n}{5}\)+7T(\frac{n}{10})+n$$
+$$T(n)=n + T\left(\frac{n}{5}\right)+T\left(\frac{7n}{10}\right)$$
 
-It's not straightforward to prove why this is `O(n)`. A quick solution is to defer to the [Master Theorem](https://en.wikipedia.org/wiki/Master_theorem_(analysis_of_algorithms)#Generic_form). We fall into case 3 of the master theorem where the work at each level dominates the work of the subproblems. In this case, our total work is just the work at each level, `O(n)`.
+It's not straightforward to prove why this is `\(O(n)\)`. The initial version of this post alluded to the master theorem, but someone recently brought to my attention that that is incorrect -- since there are two recursive terms, you can't apply the master theorem. Rather, the only straightforward proof that I'm aware of is by induction.[^induction]
 
 ### Recap
-We have quickselect, an algorithm that can find the median in linear time given a sufficiently good pivot. We have our median-of-medians algorithm, an `O(n)` algorithm to select a pivot (which is good enough for quickselect). Combining the two, we have an algorithm to find the median (or the nth element of a list) in linear time!
+We have quickselect, an algorithm that can find the median in linear time given a sufficiently good pivot. We have our median-of-medians algorithm, an `\(O(n)\)` algorithm to select a pivot (which is good enough for quickselect). Combining the two, we have an algorithm to find the median (or the nth element of a list) in linear time!
 
 ### Linear Time Medians In Practice
-In the real world, selecting a median at random is almost always sufficient. Although the median-of-medians approach is still linear time, it just takes too long to compute in practice. The `C++` standard library uses an algorithm called [introselect](https://en.wikipedia.org/wiki/Introselect) which utilizes a combination of heapselect and quickselect and has an `O(n log n)` bound. Introselect allows you to use a generally fast algorithm with a poor upper bound in combination with an algorithm that is slower in practice but has a good upper bound. Implementations start with the fast algorithm, but fall back to the slower algorithm if they're unable to pick effective pivots.
+In the real world, selecting a median at random is almost always sufficient. Although the median-of-medians approach is still linear time, it just takes too long to compute in practice. The `C++` standard library uses an algorithm called [introselect](https://en.wikipedia.org/wiki/Introselect) which utilizes a combination of heapselect and quickselect and has an `\(O(n \log n)\)` bound. Introselect allows you to use a generally fast algorithm with a poor upper bound in combination with an algorithm that is slower in practice but has a good upper bound. Implementations start with the fast algorithm, but fall back to the slower algorithm if they're unable to pick effective pivots.
 
 To finish out, here's a comparison of the elements considered by each implementation. This isn't runtime performance, but instead the total number of elements looked at by the quickselect function. It doesn't count the work to compute the median-of-medians. The point of this graph **is not** to demonstrate that median-of-medians is a good algorithm, but rather to demonstrate that it's an effective way to pick pivots.
 
@@ -211,10 +226,15 @@ It's exactly what you would expect! The deterministic pivot almost always consid
 
 P.S: In 2017 a [new paper](http://erdani.com/research/sea2017.pdf) came out that actually makes the median-of-medians approach competitive with other selection algorithms. Thanks to the paper's author, Andrei Alexandrescu for bringing it to my attention!
 
-Thanks to Leah Alpert for reading drafts of this post. Reddit users `axjv` and `linkazoid` pointed out that `9` mysteriously disappeared in my example which has since been fixed.
+Thanks to Leah Alpert for reading drafts of this post. Reddit users `axjv` and `linkazoid` pointed out that `9` mysteriously disappeared in my example which has since been fixed. Another astute reader pointed out several errors which have since been resolved: 
+
+- The recurrence relation was `\(7T(n/10)\)` but should have been `\(T(7n/10))\)`
+- The master theorem is actually inapplicable in this case
+- I incorrectly referred to the top right, instead of top left quadrant in my arguments
 
 ***
 {{% subscribe %}}
 
 [^2]: This could be an interesting application of radix sort if you were attempting to find the median in a list of integers, all less than 2^32.
 [^3]: Python actually uses Timsort, an impressive combination of theoretical bounds and practical performance. [Notes on Python Lists](/posts/notes-on-cpython-list-internals/)
+[^induction]: See the final page of [a lecture by Ron Rivest on the subject](http://stellar.mit.edu/S/course/6/sp12/6.046/courseMaterial/topics/topic2/lectureNotes/L01/L01.pdf)
