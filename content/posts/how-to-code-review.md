@@ -1,8 +1,7 @@
 ---
 title: "How to Code Review"
 date: 2019-10-23T09:59:22-07:00
-draft: true
-prose: true
+draft: false
 tags: ["eng-leadership"]
 ---
 _This document is adapted from an internal document I wrote for one of my clients, [LogicHub](https://www.logichub.com/). They've graciously allowed me to adapt it and share it as the blog post you're reading now._
@@ -12,6 +11,7 @@ As a reviewer, your primary goal is to find bugs before code is merged. Your sec
 
 ## Key Components
 The guide that follows is quite prescriptive, but there are a few components I think are generally crucial to giving a good review on a non-trivial piece of code:
+
 1. Taking multiple passes: Providing feedback that goes beyond line-by-line nits is really only possible when you are viewing code a second time (or more) with the added context of how it fits into the bigger picture.
 2. Don't just skim the tests: Tests are runnable documentation of the code's behavior. Rather than skimming them last as an afterthought, reading them early provides key context for the rest of the diff.
 
