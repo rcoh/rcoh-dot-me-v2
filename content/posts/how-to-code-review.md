@@ -3,7 +3,7 @@ title: "How to Code Review"
 date: 2019-10-23T09:59:22-07:00
 draft: true
 prose: true
-tags: ["code-review", "eng-leadership"]
+tags: ["eng-leadership"]
 ---
 _This document is adapted from an internal document I wrote for one of my clients, [LogicHub](https://www.logichub.com/). They've graciously allowed me to adapt it and share it as the blog post you're reading now._
 
@@ -29,10 +29,12 @@ This guide won't make code reviews easy and it doesn't magically find bugs. But 
     - Improperly handled error conditions / exceptions
     - Obvious race conditions
     - Language feature misunderstandings, eg. in Python:
+
         ```python
         try:
           ...
-        except IOError, ValueError: # doesn't catch both, it renames aliases IOError to ValueError
+        except IOError, ValueError: # doesn't catch both, it aliases IOError to ValueError
+          ...
         ```
     - Unchecked invariants eg. `array[0]` when the array might be empty.
 
