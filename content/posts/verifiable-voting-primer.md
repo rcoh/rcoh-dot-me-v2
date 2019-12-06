@@ -48,6 +48,7 @@ Each layer of the mixnet performs the following operations:
 2. Change the random salt of each vote. Shuffle the ordering of the ballots.
 3. Re-encrypt each vote with the public key of the next layer (or in the case of the final mixnet, simply output the decrypted votes).
 
+**Since all the encryption is public key encryption, by selectively revealing salts, the mix servers can prove that they are shuffling ballots without changing their contents.**
 Mixnets provide two things:
 1. Shuffle & anonymize the input ballots to provide privacy
 2. Provide a framework where each group of two servers can prove it did not alter votes to provide robustness.
@@ -56,7 +57,7 @@ Mixnets provide two things:
 I'm not going to go into depth here. For that, you'll want to read [Making Mix Nets Robust For Electronic Voting By
 Randomized Partial Checking by Jakobsson, Jules and Rivest](https://people.csail.mit.edu/rivest/voting/papers/JakobssonJuelsRivest-MakingMixNetsRobustForElectronicVotingByRandomizedPartialChecking.pdf). Rather, I'll attempt to provide a summary that will hopefully satisfy most readers.
 
-The key insight to verifying a mixnet is that we can force each layer to reveal a subset of its connections without violating the privacy of a single ballot. Specifically, we'll focus on pairs of servers. For each server, we force it to reveal a subset of a connections, such that no input can be traced end-to-end through the pair of servers. If one server reveals the corresponding input and output, the subsequent server _will not_ be required to reveal the corresponding input and output.
+The key insight to verifying a mixnet is that we can force each layer to reveal a subset of its connections without violating the privacy of a single ballot. **When a mixnet reveals a connection, it allows an outside observer to verify that a ballot was not tampered with.** Specifically, we'll focus on pairs of servers. For each server, we force it to reveal a subset of a connections, such that no input can be traced end-to-end through the pair of servers. If one server reveals the corresponding input and output, the subsequent server _will not_ be required to reveal the corresponding input and output.
 
 Since the mixnet servers use public key encryption, the only piece of information required to be leaked for verification is the random salt -- with that salt, an exterior observer can use the public key to reproduce the encryption and be assured the that contents of the votes were unchanged.
 
