@@ -1,0 +1,138 @@
+---
+title: "Verifiable Voting: A Primer"
+date: 2019-11-23T14:48:30-08:00
+draft: true
+enableMath: true
+---
+
+Given the level of distrust in election systems in recent years, I became curious about verifiable voting systems -- systems in which you can ensure that your vote was _really_ counted, and counted correctly. Systems in which everyone (or at least interested parties) can verify that election results on the whole are correct. This blog post discusses the current work in verifiable voting systems, both in theory and in practice.
+
+Verifiable voting is hard because you need a system in which everyone can ensure there votes were properly counted, without breaching the privacy of the election. Any system where a 3rd party can determine, with certainty, the vote of a specific individual is vulnerable to coercion.
+
+Most of these systems rely on cryptography -- Rivest created a system which _does not_ rely on cryptography, although the complexity of filling out the ballot seems too funky to use in practice.[^triple]  But, modern cryptographic voting systems have enabled an end-user verifiable-voting experience essentially identical to what voters expect.
+
+The way it all works is pretty cool, no matter what level you understand it at. In this blog post I'll provide a series of more and more in depth explanations of how verifiable voting functions. There are a couple of different systems to achieve this -- I'll be describing a system called Pret a Voter (the only one, to my knowledge, that's been used in a real election)[^realelection]. Going into the 2020 Election, Microsoft has been pushing Election Guard, a system based on Homomorphic encryption.[^microsoft] I won't go into that system here.
+
+Disclaimer: I am not an expert in any of these subjects. Please don't base your voting system on this blog post. I'm sure I've simplified certain areas in ways that may subtly comprise election security if you follow my descriptions verbatim.
+
+## At a High Level
+
+The first key insight in verifiable voting is the "split ballot". The labels of the ballot is on the left side. The right side of ballot is where the actual votes are recorded. The right side also contains an encrypted QR code or piece of text that securely indicates the ballot ordering so that the vote can be counted. When a voter votes, they mark the appropriate option on the right side, split off and destroy the left hand side of the ballot, and submit the right hand side.
+
+![Example Ballot](/images/ballot.svg)
+
+The right hand side of each ballot is then posted on the internet. Because the ballots posted are only the right hand sides, you can't determine what candidate a ballot has been cast for, but, crucially, you can find _your_ vote and make sure the selection is correct. _Election security depends on a non-trivial fraction of voters validating their vote online._
+
+Next, we need to actually count the ballots in a way that can be verified. The key idea is that the ballots are shuffled in a way that we can be sure that no individual vote has been changed. Once the ballots come out the other end of the shuffle, we know the actual value of each vote, but _not_ the original vote it came from. This step be easily audited by laypeople, but is checkable by anyone who cares.
+
+## Under the hood
+There's a lot of handwaving in the high level explanation, and a lot of deference to assumption. I'll try to get rid of some of those assumptions here. To understand this section, you'll need a basic understanding of public-key/asymmetric cryptography. In one sentence: Public key crypto means that anyone can encrypt a message that only the person with the secret key can read. You don't need to know the secret key to encrypt a message, only to decrypt it.
+
+### Construction of Ballots
+Suppose the election has a secret key `\(K_s\)` and a corresponding public key `\(K_p\)`. Ballot generation machines each are provided with the public key, allowing them to encrypt data. The voting machine generates a randomly ordered ballot and encrypts the ordering along with a random salt.[^salt] The encrypted ordering is printed onto the right hand side of the ballot as a QR code (or text, in the case of simple ballots). In the case of more complex elections, eg. ranked choice voting, or jurisdictions that have laws about the order candidates appear on a ballot, voters can input their results on an electronic device in a traditional ballot format. The machine will then generate & print a filled out ballot on demand that can be verified and perforated in the same format as the image above.
+
+#### How do you know your ballot was properly constructed?
+Proving that ballots are valid is tricky. One solution is to select ballots at random to be "spoiled" -- at random, voters or polling place workers may decide to spoil a ballot they've been given and request an additional ballot. Since the ballots are encrypted with a public key, the only thing required to verify a ballot is properly constructed is the random salt. The ballot can be immediately spoiled for the voter by querying the voting system for the corresponding salt. This ballot is then invalidated. There are several similar systems described in [Culnane et al, sec 3.1.3](https://arxiv.org/pdf/1404.6822.pdf) that all hinge on the same principle of invalidating a given ballot in order to prove the the encryption was correct.
+
+### Counting the Votes
+This is where things start to get interesting -- we need a system where all the known (but encrypted) votes go in, and the decrypted votes come out but without the ability to match a decrypted vote to its corresponding input vote. Prêt à Voter uses a system called "mix nets", originally conceived by David Chaum to support "Untraceable Electronic Mail, Return Addresses, and Digital Pseudonyms."[^mixnetpaper] The idea is that we want to create a "mixer" where many messages go in, many messages go out, and we have no way of knowing (better than guessing), which output corresponds to which input. Crucially, mixnets offer a guarntee that input=output, even though the input has been shuffled.
+
+There are several ways to use mixnets to support voting privacy, but the basic concept is as follows: There are `\(n\)` mixnet servers[^server]. The first mixnet server has the private key of the election, `\(K_s\)`.[^mixpk] The subsequent mixnet servers generate their own private/public key pairs. Each mixnet server reveals its public key.
+
+Each layer of the mixnet performs the following operations:
+1. Decrypt the incoming votes (the votes were encrypted with the corresponding public key of the layer already).
+2. Change the random salt of each vote. Shuffle the ordering of the ballots.
+3. Re-encrypt each vote with the public key of the next layer (or in the case of the final mixnet, simply output the decrypted votes).
+
+Mixnets provide two things:
+1. Sufficiently shuffle the input ballots to decrypt them while also guaranteeing privacy
+2. Provide a framework where each group of two servers can prove it did not alter votes while still preserving privacy.
+
+### Verifying the count
+I'm not going to go into depth here. For that, you'll want to read [Making Mix Nets Robust For Electronic Voting By
+Randomized Partial Checking by Jakobsson, Jules and Rivest](https://people.csail.mit.edu/rivest/voting/papers/JakobssonJuelsRivest-MakingMixNetsRobustForElectronicVotingByRandomizedPartialChecking.pdf). Rather, I'll attempt to provide a summary that will hopefully satisfy most readers.
+
+The key insight to verifying a mixnet is that we can force each layer to reveal a subset of its connections without violating the privacy of a single ballot. Specifically, we'll focus on pairs of servers. For each server, we force it to reveal a subset of a connections, such that no input can be traced end-to-end through the pair of servers. If on server reveals the corresponding input and output, the subsequent server _will not_ be required to reveal the cooresponding input/output.
+
+Since the mixnet servers use public key encryption, the only piece of information required to be leaked for verification is the random salt -- with that salt, an exterior observer can use the public key to reproduce the encryption.
+
+![Mixnet Randomized Partial Checking](/images/mixnet.svg)
+
+In the figure above, I've used color to denote the identities known about each ballot. Crucially, we don't know how any output layer ballot corresponds to input layer ballots even though we know 50% of the connections in each layer. The [paper](https://people.csail.mit.edu/rivest/voting/papers/JakobssonJuelsRivest-MakingMixNetsRobustForElectronicVotingByRandomizedPartialChecking.pdf) provides the privacy and robustness proof for this scheme -- I won't get into it here.
+
+## Wrap Up
+Hopefully this serves as a satisfying summary for how verifiable voting can work in practice. One major caveat of these schemes is that it doesn't seem like people using the system necessarily understand what was going on. More than have of respondents to a poll after the election in Australia thought that someone who had their receipt knew who they voted for. Though this doesn't reduce the security or post any problems for the election, at the end of the day, systems like this will only be implemented if people really understand the benefits they provided.
+
+If I got something wrong, as always, please let me know! You can make a pull request or file an issue on Github: [https://github.com/rcoh/rcoh-dot-me-v2]
+***
+{{% subscribe %}}
+
+[^salt]: The salt (or sometimes referred as random padding) is crucial for ballot secrecy -- since there a finite number of permutations of the ballot, without it, an adversary could determine the contents of a vote simply by enumerating possible ballot permutations and matching the resulting cipher texts. (Recall that anyone can produce an encrypted ballot because the ballots are encrypted with a public key).
+
+[^server]: These are referred to as servers because they came from email, but there is no real reason why, in the case of voting, that each server need to be separated. It can be an iterative process on one computer.
+
+[^triple]: Rivest, 2006: The system involves 3 identical ballots. Voters vote twice for the candidate they want and once for the candidates that they don't want. The resulting vote totals are offset by the number of total voters, so the original vote totals can be discovered with simple counting. Besides being impractical in practice, it also doesn't fully protect from vote buying. [Full Paper](https://people.csail.mit.edu/rivest/Rivest-TheThreeBallotVotingSystem.pdf)
+
+[^realelection]: Pret a Voter was used in the state of Victoria, Australia which uses Ranked-Choice voting. [Paper describing how Pret a Voter was applied in practice.](https://arxiv.org/pdf/1404.6822.pdf). [Follow up paper describing results](http://epubs.surrey.ac.uk/809386/1/vVote.pdf)
+
+[^mixpk]: In reality, each mixnet server contains some cryptographic information that, only when combined with other mixnet servers, can decrypt the ballots. See [Threshold Cryptosystem](https://en.wikipedia.org/wiki/Threshold_cryptosystem). For purposes of explanation, I've elided this detail in the main discussion.
+
+[^microsoft]: [Verifiable Secret Ballot Elections, Josh Daniel Cohen Benaloh, 1996](https://www.microsoft.com/en-us/research/wp-content/uploads/1987/01/thesis.pdf) [SDK Spec](https://github.com/microsoft/ElectionGuard-SDK-Specification) 
+
+[^mixnetpaper]: Untraceable electronic mail, return addresses, and digital
+pseudonyms. Communications of the ACM, 24(2):84–88, 1981. [PDF](https://www.freehaven.net/anonbib/cache/chaum-mix.pdf)
+
+
+<!--
+# Pret a Voter
+
+Verifiable voting systems can be considered as having 2 parts:
+1. Frontend: What the voter interacts with. The frontend allows to voter to ensure that their vote was properly recorded
+2. Backend: The backend tabulates the votes in a privacy-preserving way in a way that is provably correct.
+
+
+
+Front end & Backend [pret a voter is a frontend]
+
+Pret a voter with "mixnet": David Chaum. Untraceable electronic mail, return addresses, and digital
+pseudonyms. Communications of the ACM, 24(2):84–88, 1981.]
+
+Mixnet: Lots of inputs in, each encrypted so only the "mix" can read. The mix gets batch inputs and batch outputs. By outputing all at once, it has anonymized where the inputs come from. "Randomized Partial Checking" to verify mixnets are working.
+
+"Threshold": A k out of l threshold signature scheme is a protocol that allows any subset of k
+players out of l to generate a signature, but that disallows the creation of a valid
+signature if fewer than k players participate in the protocol. This non-forgeability
+property should hold even if some subset of less than k players are corrupted
+and work together. For a threshold scheme to be useful when some players are
+corrupted, it should should also be robust, meaning that corrupted players should
+not be able to prevent uncorrupted players from generating signatures.
+
+"Elections in which any interested party can verify that
+the ballots have been properly counted are possible if
+anonymously mailed ballots are signed with pseudonyms
+from a roster of registered voters."
+
+http://epubs.surrey.ac.uk/809386/1/vVote.pdf
+https://arxiv.org/pdf/1404.6822.pdf
+
+MSFT Paper: https://www.microsoft.com/en-us/research/wp-content/uploads/1987/01/thesis.pdf
+
+Voting machines have a public key to generate ballots
+
+pyramid
+
+ballot spoiling -- to verify that ballots are encrypted properly
+
+The postings must be non-malleable or
+plaintext aware [9, 4, 6].
+
+In the current political climate
+
+
+
+
+2 general approaches:
+1. Mixnets + RPC
+2. Homomorphic encryption
+
+-->
