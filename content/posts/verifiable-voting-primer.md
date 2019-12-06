@@ -5,7 +5,7 @@ draft: false
 enableMath: true
 ---
 
-Given the level of distrust in election systems in recent years, I became curious about verifiable voting systems -- systems in which you can ensure that your vote was _really_ counted, and counted correctly. Systems in which everyone (or at least interested parties) can verify that election results precisely reflect the votes cast. This blog post discusses the current work in verifiable voting systems, both in theory and in practice.
+Given the level of distrust in election systems in recent years, I became curious about verifiable voting systems -- systems in which you can ensure that your vote was _really_ counted, and counted correctly. Systems in which everyone (or at least interested parties) can verify that election results precisely reflect the votes cast. The verifiable voting system I'll describe is pretty close to "regular" voting for voters. They don't need to care the election is e2e verified, they just need to vote like normal. Only people interested in verifying need to do anything beyond casting a standard ballot. This blog post discusses the current work in verifiable voting systems, both in theory and in practice.
 
 Verifiable voting is hard because systems must satisfy two requirements that appear to be at odds:
 1. Every individual should be able to verify their vote was properly counted.
@@ -21,13 +21,16 @@ In this blog post I'll provide a high level overview of how verifiable voting fu
 
 ## At a High Level
 
-The first key insight in verifiable voting is the "split ballot". The candidate labels of the ballot are on the left side. The right side of ballot is where the actual votes are recorded. Each ballot has a randomized order -- this means that a right-hand ballot alone can't reveal who the vote was cast for. The right side also contains an encrypted QR code or piece of text that securely indicates the ballot ordering so that the vote can be counted. When a voter votes, they mark the appropriate option on the right side, split off and destroy the left-hand side of the ballot, and submit the right-hand side. They'll receive a copy of the right-hand side of their ballot as a receipt. If you're satisfied by this explanation, feel free to jump to the end. Otherwise, keep reading!
-
+The first key insight in verifiable voting is the "split ballot". The candidate labels of the ballot are on the left side. The right side of ballot is where the actual votes are recorded. Each ballot has a randomized order -- this means that a right-hand ballot alone can't reveal who the vote was cast for. The right side also contains an encrypted QR code or piece of text that securely indicates the ballot ordering so that the vote can be counted. When a voter votes, they mark the appropriate option on the right side, split off and destroy the left-hand side of the ballot, and submit the right-hand side. They'll receive a copy of the right-hand side of their ballot as a receipt. 
 ![Example Ballot](/images/ballot.svg)
 
-The right-hand side of each ballot is then posted on the internet. Because the ballots posted are only the right-hand sides, you can't determine what candidate a ballot has been cast for, but, crucially, you can find _your_ vote and make sure the selection is matches your receipt. _Election security depends on a non-trivial fraction of voters validating their vote online._
+This sort of voting is quite similar to a "normal" polling place experience, but, with the addition of a receipt.
+
+The right-hand side of each ballot is then posted on the internet -- the literature describes this phase as the "Web bulletin board" or WBB. Because the ballots posted are only the right-hand sides, you can't determine what candidate a ballot has been cast for, but, crucially, you can find _your_ vote and make sure the selection is matches your receipt. _Election security depends on a non-trivial fraction of voters validating their vote online._
 
 Next, we need to actually count the ballots in a way that can be verified. The key idea is that the ballots are shuffled in a way that we can be sure that no individual vote has been changed, but we don't know which input vote corresponds to which output vote. Once the ballots come out the other end of the shuffle, we know the actual value of each vote, but _not_ the original vote it came from. This step be cannot easily audited by laypeople, but they can delegate to a trusted auditor.
+
+If you're satisfied by this explanation, feel free to jump to the end. Otherwise, keep reading!
 
 ## Under the hood
 There's a lot of handwaving in the high level explanation, and a lot of deference to assumption. I'll try to get rid of some of those assumptions here. To understand this section, you'll need a basic understanding of [public-key/asymmetric cryptography](https://en.wikipedia.org/wiki/Public-key_cryptography). In one sentence: Public key crypto means that anyone can encrypt a message that only the person with the secret key can read. You don't need to know the secret key to encrypt a message, only to decrypt it.
