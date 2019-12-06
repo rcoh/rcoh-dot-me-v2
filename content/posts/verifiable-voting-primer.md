@@ -15,7 +15,7 @@ Any system where a 3rd party can determine, with certainty, the vote of a specif
 
 Most of these systems rely on cryptography -- Rivest created a system which _does not_ rely on cryptography, although the complexity of filling out the ballot seems too funky to use in practice.[^triple]  But, modern cryptographic voting systems have enabled an end-user voting experience essentially identical to what voters expect but with the added bunus of end-to-end verifiability.
 
-In this blog post I'll provide a high level overview of how verifiable voting functions, followed by a slightly more mathy look at how it all works under the hood. There several different verifiable voting systems that have been conceived of -- I'll be describing a system called Prêt à Voter (the only one, to my knowledge, that's been used in a real election)[^realelection]. Going into the 2020 Election, Microsoft has been pushing Election Guard, a system based on Homomorphic encryption.[^microsoft] I won't go into that system here.
+In this blog post I'll provide a high level overview of how verifiable voting functions, followed by a slightly more mathy look at how it all works under the hood. There several different verifiable voting systems that have been conceived of -- I'll be describing a system called Prêt à Voter (~~the only one, to my knowledge, that's been used in a real election~~. Someone recently brought Scantegrity to my attention, which was also used in [two US elections.](https://www.chaum.com/publications/Scantegrity-II-Municipal-Election-at-Takoma-Park-the-first-E2E-Binding-Governmental-Election-with-Ballot-Privacy.pdf))[^realelection]. Going into the 2020 Election, Microsoft has been pushing Election Guard, a system based on Homomorphic encryption.[^microsoft] I won't go into that system here.
 
 **Disclaimer**: _I am not an expert in any of these subjects. Please don't build a voting system from my blog post._
 
@@ -77,7 +77,7 @@ If I got something wrong, as always, please let me know! You can make a pull req
 
 [^triple]: Rivest, 2006: The system involves 3 identical ballots. Voters vote twice for the candidate they want and once for the candidates that they don't want. The resulting vote totals are offset by the number of total voters, so the original vote totals can be discovered with simple counting. Besides being impractical in practice, it also doesn't fully protect from vote buying. [Full Paper](https://people.csail.mit.edu/rivest/Rivest-TheThreeBallotVotingSystem.pdf)
 
-[^realelection]: Pret a Voter was used in the state of Victoria, Australia which uses Ranked-Choice voting. [Paper describing how Pret a Voter was applied in practice.](https://arxiv.org/pdf/1404.6822.pdf). [Follow up paper describing results](http://epubs.surrey.ac.uk/809386/1/vVote.pdf)
+[^realelection]: Pret a Voter was used in the state of Victoria, Australia which uses Ranked-Choice voting. [Paper describing how Pret a Voter was applied in practice.](https://arxiv.org/pdf/1404.6822.pdf). [Follow up paper describing results](http://epubs.surrey.ac.uk/809386/1/vVote.pdf). Scantegrity was used in two elections in Maryland. Scantegrity is a "front-end" for verifiable voting (like the tear apart ballot in Pret a Voter). It is used in combination with a backend like Mixnets to actually count the votes.
 
 [^microsoft]: [Verifiable Secret Ballot Elections, Josh Daniel Cohen Benaloh, 1996](https://www.microsoft.com/en-us/research/wp-content/uploads/1987/01/thesis.pdf) [SDK Spec](https://github.com/microsoft/ElectionGuard-SDK-Specification) 
 
