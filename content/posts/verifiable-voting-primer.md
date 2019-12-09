@@ -8,6 +8,7 @@ enableMath: true
 Given the level of distrust in election systems in recent years, I became curious about verifiable voting systems -- systems in which you can ensure that your vote was _really_ counted, and counted correctly. Systems in which everyone (or at least interested parties) can verify that election results precisely reflect the votes cast. The verifiable voting system I'll describe is pretty close to "regular" voting for voters. They don't need to care the election is e2e verified, they just need to vote like normal. Only people interested in verifying need to do anything beyond casting a standard ballot. This blog post discusses the current work in verifiable voting systems, both in theory and in practice.
 
 Verifiable voting is hard because systems must satisfy two requirements that appear to be at odds:
+
 1. Every individual should be able to verify their vote was properly counted.
 2. No individual should be able to prove who they voted for. 
 
@@ -47,12 +48,14 @@ This is where things start to get interesting -- we need a system where all the 
 There are several ways to use mixnets to support voting privacy, but the basic concept is as follows: There are `\(n\)` mixnet servers[^server]. The first mixnet server has the private key of the election, `\(K_s\)`.[^mixpk] The subsequent mixnet servers generate their own private/public key pairs. Each mixnet server reveals its public key.
 
 Each layer of the mixnet performs the following operations:
+
 1. Decrypt the incoming votes (the votes were encrypted with the corresponding public key of the layer server).
 2. Change the random salt of each vote. Shuffle the ordering of the ballots.
 3. Re-encrypt each vote with the public key of the next layer (or in the case of the final mixnet, simply output the decrypted votes).
 
 **Since all the encryption is public key encryption, by selectively revealing salts, the mix servers can prove that they are shuffling ballots without changing their contents.**
 Mixnets provide two things:
+
 1. Shuffle & anonymize the input ballots to provide privacy
 2. Provide a framework where each group of two servers can prove it did not alter votes to provide robustness.
 
