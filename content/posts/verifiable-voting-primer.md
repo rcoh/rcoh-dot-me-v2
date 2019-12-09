@@ -14,7 +14,7 @@ Verifiable voting is hard because systems must satisfy two requirements that app
 
 Any system where a 3rd party can determine, with certainty, the vote of a specific individual is vulnerable to coercion.
 
-Most of these systems rely on cryptography -- Rivest created a system which _does not_ rely on cryptography, although the complexity of filling out the ballot seems too funky to use in practice.[^triple]  But, modern cryptographic voting systems have enabled an end-user voting experience essentially identical to what voters expect but with the added bunus of end-to-end verifiability.
+Most of these systems rely on cryptography -- Rivest created a system which _does not_ rely on cryptography, although the complexity of filling out the ballot seems too funky to use in practice.[^triple]  But, modern cryptographic voting systems have enabled an end-user voting experience essentially identical to what voters expect but with the added bonus of end-to-end verifiability.
 
 In this blog post I'll provide a high level overview of how verifiable voting functions, followed by a slightly more mathy look at how it all works under the hood. There several different verifiable voting systems that have been conceived of -- I'll be describing a system called Prêt à Voter (~~the only one, to my knowledge, that's been used in a real election~~. Someone recently brought Scantegrity to my attention, which was also used in [two US elections.](https://www.chaum.com/publications/Scantegrity-II-Municipal-Election-at-Takoma-Park-the-first-E2E-Binding-Governmental-Election-with-Ballot-Privacy.pdf))[^realelection]. Going into the 2020 Election, Microsoft has been pushing Election Guard, a system based on Homomorphic encryption.[^microsoft] I won't go into that system here.
 
