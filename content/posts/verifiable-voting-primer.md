@@ -88,8 +88,7 @@ If I got something wrong, as always, please let me know! You can make a pull req
 
 [^salt]: The salt (or sometimes referred as random padding) is crucial for ballot secrecy -- since there a finite number of permutations of the ballot, without it, an adversary could determine the contents of a vote simply by enumerating possible ballot permutations and matching the resulting cipher texts. (Recall that anyone can produce an encrypted ballot because the ballots are encrypted with a public key).
 
-[^mixnetpaper]: Untraceable electronic mail, return addresses, and digital
-pseudonyms. Communications of the ACM, 24(2):84–88, 1981. [PDF](https://www.freehaven.net/anonbib/cache/chaum-mix.pdf)
+[^mixnetpaper]: Untraceable electronic mail, return addresses, and digital pseudonyms. Communications of the ACM, 24(2):84–88, 1981. [PDF](https://www.freehaven.net/anonbib/cache/chaum-mix.pdf)
 
 [^server]: These are referred to as servers because they came from email, but there is no real reason why, in the case of voting, that each server need to be separated. It can be an iterative process on one computer.
 
@@ -97,57 +96,3 @@ pseudonyms. Communications of the ACM, 24(2):84–88, 1981. [PDF](https://www.fr
 
 
 
-
-<!--
-# Pret a Voter
-
-Verifiable voting systems can be considered as having 2 parts:
-1. Frontend: What the voter interacts with. The frontend allows to voter to ensure that their vote was properly recorded
-2. Backend: The backend tabulates the votes in a privacy-preserving way in a way that is provably correct.
-
-
-
-Front end & Backend [pret a voter is a frontend]
-
-Pret a voter with "mixnet": David Chaum. Untraceable electronic mail, return addresses, and digital
-pseudonyms. Communications of the ACM, 24(2):84–88, 1981.]
-
-Mixnet: Lots of inputs in, each encrypted so only the "mix" can read. The mix gets batch inputs and batch outputs. By outputing all at once, it has anonymized where the inputs come from. "Randomized Partial Checking" to verify mixnets are working.
-
-"Threshold": A k out of l threshold signature scheme is a protocol that allows any subset of k
-players out of l to generate a signature, but that disallows the creation of a valid
-signature if fewer than k players participate in the protocol. This non-forgeability
-property should hold even if some subset of less than k players are corrupted
-and work together. For a threshold scheme to be useful when some players are
-corrupted, it should should also be robust, meaning that corrupted players should
-not be able to prevent uncorrupted players from generating signatures.
-
-"Elections in which any interested party can verify that
-the ballots have been properly counted are possible if
-anonymously mailed ballots are signed with pseudonyms
-from a roster of registered voters."
-
-http://epubs.surrey.ac.uk/809386/1/vVote.pdf
-https://arxiv.org/pdf/1404.6822.pdf
-
-MSFT Paper: https://www.microsoft.com/en-us/research/wp-content/uploads/1987/01/thesis.pdf
-
-Voting machines have a public key to generate ballots
-
-pyramid
-
-ballot spoiling -- to verify that ballots are encrypted properly
-
-The postings must be non-malleable or
-plaintext aware [9, 4, 6].
-
-In the current political climate
-
-
-
-
-2 general approaches:
-1. Mixnets + RPC
-2. Homomorphic encryption
-
--->
