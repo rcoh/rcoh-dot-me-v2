@@ -83,7 +83,7 @@ To find the median with quickselect, we'll extract quickselect as a separate fun
 import random
 def quickselect_median(l, pivot_fn=random.choice):
     if len(l) % 2 == 1:
-        return quickselect(l, len(l) / 2, pivot_fn)
+        return quickselect(l, len(l) // 2, pivot_fn)
     else:
         return 0.5 * (quickselect(l, len(l) / 2 - 1, pivot_fn) +
                       quickselect(l, len(l) / 2, pivot_fn))
