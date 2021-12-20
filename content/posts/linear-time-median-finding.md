@@ -83,7 +83,7 @@ To find the median with quickselect, we'll extract quickselect as a separate fun
 import random
 def quickselect_median(l, pivot_fn=random.choice):
     if len(l) % 2 == 1:
-        return quickselect(l, len(l) / 2, pivot_fn)
+        return quickselect(l, len(l) // 2, pivot_fn)
     else:
         return 0.5 * (quickselect(l, len(l) / 2 - 1, pivot_fn) +
                       quickselect(l, len(l) / 2, pivot_fn))
@@ -216,7 +216,7 @@ It's not straightforward to prove why this is `\(O(n)\)`. The initial version of
 We have quickselect, an algorithm that can find the median in linear time given a sufficiently good pivot. We have our median-of-medians algorithm, an `\(O(n)\)` algorithm to select a pivot (which is good enough for quickselect). Combining the two, we have an algorithm to find the median (or the nth element of a list) in linear time!
 
 ### Linear Time Medians In Practice
-In the real world, selecting a median at random is almost always sufficient. Although the median-of-medians approach is still linear time, it just takes too long to compute in practice. The `C++` standard library uses an algorithm called [introselect](https://en.wikipedia.org/wiki/Introselect) which utilizes a combination of heapselect and quickselect and has an `\(O(n \log n)\)` bound. Introselect allows you to use a generally fast algorithm with a poor upper bound in combination with an algorithm that is slower in practice but has a good upper bound. Implementations start with the fast algorithm, but fall back to the slower algorithm if they're unable to pick effective pivots.
+In the real world, selecting a pivot at random is almost always sufficient. Although the median-of-medians approach is still linear time, it just takes too long to compute in practice. The `C++` standard library uses an algorithm called [introselect](https://en.wikipedia.org/wiki/Introselect) which utilizes a combination of heapselect and quickselect and has an `\(O(n \log n)\)` bound. Introselect allows you to use a generally fast algorithm with a poor upper bound in combination with an algorithm that is slower in practice but has a good upper bound. Implementations start with the fast algorithm, but fall back to the slower algorithm if they're unable to pick effective pivots.
 
 To finish out, here's a comparison of the elements considered by each implementation. This isn't runtime performance, but instead the total number of elements looked at by the quickselect function. It doesn't count the work to compute the median-of-medians. The point of this graph **is not** to demonstrate that median-of-medians is a good algorithm, but rather to demonstrate that it's an effective way to pick pivots.
 
