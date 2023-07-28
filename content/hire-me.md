@@ -3,34 +3,4 @@ title: "Hire Me"
 date: 2018-02-08T20:32:24-08:00
 draft: false
 ---
-If you're interested in hiring me for a contracting engagement, send me an email at `*@*.me` where `*` is rcoh. Please note that I'm only looking for contract work at the moment (no salaried, full-time).
-
-I'm currently open to:
-
-* Engagements from 1 day to 3 months
-* Onsite in the SF Bay Area or remote
-
-### Recent work
-
-Software-wise, I do essentially everything, but I specialize in backend infrastructure projects. I can get onboarded quickly and I'm usually shipping code and adding value on the first day.
-
-Recently, my work has fallen into two categories:
-
-- Help design and ship backend projects
-  - I helped [ReturnToCorp](https://returntocorp.com) migrate to Kubernetes
-  - I helped [Nylas](https://nylas.com) architect, code, and ship a [new webhooks delivery infrastructure that cut latency by 60x](https://www.nylas.com/blog/-speeding-up-our-webhooks-system-60x)
-  - I worked on the Kubernetes deployment system for [Kensho](https://kensho.com)
-  - I built a DSL that compiles to Spark for [LogicHub](https://www.logichub.com/)
-  - I helped a health startup use crypto properly and make key architectural decisions
-
-- Help _very early_ startups establish their tech stack while they're working on making their first technical hires. I've done it many times, so I know how to get it right the first time. I typically help with things like:
-  - Design initial architecture, aiming for simplicity and scalability
-  - Setup Ansible/Terraform
-  - Setup Kubernetes/Docker infrastructure
-  - Continuous Integration / Deployment
-  - SSL
-  - Setup database migrations the right way
-  - Establish a developer culture of testing / code review and trust
-
-
-If this sounds good, drop me a line! `*@*.me` where `*` is rcoh, or send me a DM on [Twitter](https://twitter.com/russellrcohen).
+I'm not looking for new work currently. Thanks for reaching out!

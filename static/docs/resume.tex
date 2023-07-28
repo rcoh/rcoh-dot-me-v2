@@ -229,8 +229,8 @@
 %\begin{tabular}{c{\textwidth/2}c{\textwidth/2}}
 %\begin{tabular}[t]{@{}p{\textwidth/2}p{\textwidth/2}}
 \\
-15 Connecticut Ave\: & \href{mailto:rcoh@rcoh.me}{rcoh@rcoh.me} \\
-Somerville, MA 02145\: 
+285 Washington Street\: & \href{mailto:rcoh@rcoh.me}{rcoh@rcoh.me} \\
+Melrose, MA 02176\: 
 \end{tabular}
 %\end{center}
 
@@ -260,7 +260,27 @@ Somerville, MA 02145\:
 %\blankline \vspace{2mm}
 
 \section{Work Experience}
-\href{http://rcoh.me}{\textbf{Self Employed}}, Redwood City, CA \hfill{Freelance Software Engineer, February 2016 | Present}
+\href{https://github.com/awslabs/aws-sdk-rust}{\textbf{AWS}}, Melrose, MA (Remote) \hfill{Senior Software Engineer, July 2020 | Present}
+ \begin{outerlist}
+    \item[] \begin{innerlist}[-]
+        \item Design and build \href{https://github.com/awslabs/smithy-rs}{smithy-rs}, a client and server code generator for 
+        the \href{https://smithy.io}{Smithy IDL}. \href{https://github.com/awslabs/smithy-rs}{smithy-rs} generates clients for 
+        the AWS SDK, dozens of internal AWS services, and several external customers.
+        \item Found and lead team to build \href{https://github/awslabs/aws-sdk-rust}{AWS SDK for Rust}.
+	\item[] \begin{innerlist}[+]
+                \item Work with Rust language and SDK stakeholders to design an SDK balancing ease-of-use, flexibility and performance.
+                The Rust SDK is among the fastest AWS SDK with overhead of 20-30$\mu$s per request.
+                \item Build wire-level traffic record-and-replay framework for deterministic testing and fault simulation.
+                \item Implement high-performance parser and serializer generators for XML and JSON.
+        \end{innerlist}
+        \item Lead organization-wide initiative to code generate endoint resolution across all SDKs. 
+        This reduces custom code and implementation time while eliminating a class of common SDK bugs.
+    \end{innerlist}
+\end{outerlist}
+
+\blankline
+
+\href{http://rcoh.me}{\textbf{Self Employed}}, Redwood City, CA \hfill{Freelance Software Engineer, February 2016 | 2020}
  \begin{outerlist}
     \item[] \begin{innerlist}[-]
         \item Consult on key scalability and architecture decisions
@@ -296,8 +316,6 @@ Somerville, MA 02145\:
  	\item[] \begin{innerlist}[-]
 		\item Scaled highly available service to \textgreater 300QPS while reducing the
 number of servers required
-		\item Designed and implemented protocol to enable high bandwidth data
-transfer between sandboxed iOS Apps
 		\item Optimized use of MongoDB, Nginx, Haproxy, uWSGI
 		\item Python, Node.js, iOS, MongoDB, Postgres, Haproxy,
 Nginx, uWSGI, Flask, EC2, S3 
@@ -306,54 +324,16 @@ Nginx, uWSGI, Flask, EC2, S3
 
 \blankline
 
-\href{http://www.sumologic.com/}{\textbf{Sumo Logic}}, Mountain View, CA \hfill{Software Engineer Intern, Summer 2012}
- \begin{outerlist}
- 	\item[] \begin{innerlist}[-]
-		\item Worked with team to design / implement continuous query engine
-capable of processing 1TB data / day on a c1.xlarge
-	\item Designed novel distributed, approximate, streaming algorithms for
-data processing
-	\item Scala, MapReduce, AWS, Java, Spring, HornetQ
-	\end{innerlist}
-\end{outerlist}
-\blankline
-
-\href{http://www.google.com/}{\textbf{Google}}, Seattle, WA \hfill{Software Engineer Intern, Summer 2011}
- \begin{outerlist}
- 	\item[] \begin{innerlist}[-]
-		\item Improved search quality and the comment panel user-experience on
-Chrome Web Store
-		\item Java, Javascript / HTML / CSS, Python, C++, MapReduce
-	\end{innerlist}
-\end{outerlist}
 \vspace{-1mm}
 
 \blankline
 
-%\href{http://www.google.com/}{\textbf{MIT Media Lab}}, Cambridge, MA \hfill{Undergraduate Researcher, October 2010 | May 2011}
-% \begin{outerlist}
-% 	\item[] \begin{innerlist}[-]
-%		\item Led team of 5 developers to deploy a system to control an installation of 10,000 LEDs on the Harvard Bridge.  \href{http://fluid.media.mit.edu/projects/lightbridge}{Project Webpage + Video}
-%	\end{innerlist}
-%\end{outerlist}
-%\vspace{-1mm}
-
-
-\blankline
-%
-%\textbf{LAN Fest Conference 2011}, Skopje, Macedonia \hfill{May 2011}
-%\begin{outerlist}[]
-%    \item[] Speaker, ``Why support and compete in algorithm competitions''
-%\end{outerlist}
-%
-%\blankline
-
 \section{Skills}
-Python, Rust, Scala, Java, Go, Node.js / ES6 / React, (my/Postgre)SQL, Cassandra, Elasticsearch
+Rust, Java, Scala, Python, Go, (my/Postgre)SQL
 
 
 \section{Interests}
-rock climbing, paragliding, backpacking, cello, baking bread
+rock climbing, mountain biking, trail running
 
 \end{document}
 
