@@ -225,12 +225,9 @@
  %(617) 894-8789  & 02215        &  Skopje, Macedonia \\
 %\end{tabular}
 %\begin{center}
-\begin{tabular}{>{\centering\arraybackslash}m{\textwidth/2} >{\centering\arraybackslash}m{\textwidth/2}}
-%\begin{tabular}{c{\textwidth/2}c{\textwidth/2}}
-%\begin{tabular}[t]{@{}p{\textwidth/2}p{\textwidth/2}}
+\begin{tabular}{>{\centering\arraybackslash}m{\textwidth}}
 \\
-285 Washington Street\: & \href{mailto:rcoh@rcoh.me}{rcoh@rcoh.me} \\
-Melrose, MA 02176\: 
+\href{mailto:rcoh@rcoh.me}{rcoh@rcoh.me}
 \end{tabular}
 %\end{center}
 
@@ -239,42 +236,27 @@ Melrose, MA 02176\:
 %
 %Obtaining an internship position at Google's BOLD Practicum for the summer 2011
 
-\section{Education}
-%
-\href{http://mit.edu/}{\textbf{Massachusetts Institute of Technology}},
- Cambridge, MA \hfill{June 2013}
-\begin{outerlist}
-\item[]
-        \href{http://www.eecs.mit.edu/}
-             {Computer Science and Engineering (6--3)}, \textit{GPA:} 4.9/5.0 \vspace{+1mm} \\
-        \textit{Relevant coursework:}
-        \vspace{+1mm} \\
-            \begin{tabular}{ l r }
-                Distributed Systems Engineering (6.824) & Computer Systems Security (6.858) \\
-                Performance Engineering (6.172) & Operating System Engineering (6.828) \\
-                TA for Computer Language Engineering (6.035) & Advanced Datastructures (6.851)
-            \end{tabular}
-
-\end{outerlist}
-
-%\blankline \vspace{2mm}
-
 \section{Work Experience}
-\href{https://github.com/awslabs/aws-sdk-rust}{\textbf{AWS}}, Melrose, MA (Remote) \hfill{Senior Software Engineer, July 2020 | Present}
+\textbf{AWS} \hfill{Senior Software Engineer, July 2020 | Present}
  \begin{outerlist}
-    \item[] \begin{innerlist}[-]
-        \item Design and build \href{https://github.com/awslabs/smithy-rs}{smithy-rs}, a client and server code generator for 
-        the \href{https://smithy.io}{Smithy IDL}. \href{https://github.com/awslabs/smithy-rs}{smithy-rs} generates clients for 
-        the AWS SDK, dozens of internal AWS services, and several external customers.
-        \item Found and lead team to build \href{https://github/awslabs/aws-sdk-rust}{AWS SDK for Rust}.
-	\item[] \begin{innerlist}[+]
-                \item Work with Rust language and SDK stakeholders to design an SDK balancing ease-of-use, flexibility and performance.
-                The Rust SDK is among the fastest AWS SDK with overhead of 20-30$\mu$s per request.
-                \item Build wire-level traffic record-and-replay framework for deterministic testing and fault simulation.
-                \item Implement high-performance parser and serializer generators for XML and JSON.
-        \end{innerlist}
-        \item Lead organization-wide initiative to code generate endoint resolution across all SDKs. 
-        This reduces custom code and implementation time while eliminating a class of common SDK bugs.
+    \item[] \textit{Rust Platform Team} \hfill{2024 | Present}
+    \begin{innerlist}[-]
+        \item Lead the team supporting Rust adoption across Amazon. Find great ideas from teams
+        around the company and distill them into core primitives that become de facto solutions.
+        \item Created \href{https://github.com/awslabs/metrique}{metrique}, a low-overhead, wide-event
+        metrics library used by over 500 services. It replaced effectively all hand-written metrics
+        libraries at Amazon.
+        \item Created \href{https://github.com/dial9-rs/dial9}{dial9}, a flight recorder and profiler
+        that records Tokio runtime events, application traces, and kernel events on a single timeline.
+        Runs in production at Amazon, Cloudflare, OpenAI, and many others.
+    \end{innerlist}
+    \vspace{.4\baselineskip}
+    \item[] \textit{AWS SDK for Rust} \hfill{2020 | 2024}
+    \begin{innerlist}[-]
+        \item Founded the \href{https://github.com/awslabs/aws-sdk-rust}{AWS SDK for Rust} team and
+        led it to GA. At 20--30$\mu$s of overhead per request, it is among the fastest AWS SDKs.
+        \item Built \href{https://github.com/awslabs/smithy-rs}{smithy-rs}, the code generator behind
+        the Rust SDK and over 1,000 services at Amazon and beyond.
     \end{innerlist}
 \end{outerlist}
 
@@ -283,17 +265,11 @@ Melrose, MA 02176\:
 \href{http://rcoh.me}{\textbf{Self Employed}}, Redwood City, CA \hfill{Freelance Software Engineer, February 2016 | 2020}
  \begin{outerlist}
     \item[] \begin{innerlist}[-]
-        \item Consult on key scalability and architecture decisions
-	\item CTO/Senior engineer for hire at small startups (architect/implement MvP, design interview \& engineering process process, etc.)
-        \item Join companies for 1-3 months to finish high-value projects.
-        \item Recent Projects:
-        \item[] \begin{innerlist}[+]
-		\item \href{https://github.com/rcoh/angle-grinder}{Angle grinder}, a popular CLI app written in Rust for log analytics
-		\item \href{https://crossword.tools}{Crossword.Tools}, a tool for creating Newspaper-quality crossword puzzles. Core fill algorithm written in Rust, compiled to WASM.
-                \item Architect, code and deploy a new webhooks delivery architecture that reduced latency by 60x
-                \item Design a domain specific language that compiles to Spark
-                \item More projects at \href{https://rcoh.me/hire-me}{https://rcoh.me/hire-me}
-	\end{innerlist}
+        \item CTO/senior engineer for hire: consulted on architecture and scalability, and joined
+        startups for 1-3 months to finish high-value projects.
+        \item Wrote \href{https://github.com/rcoh/angle-grinder}{angle-grinder}, a popular Rust CLI app for
+        log analytics, and \href{https://crossword.tools}{Crossword.Tools}, a crossword construction tool
+        with a Rust fill algorithm compiled to WASM.
     \end{innerlist}
 \end{outerlist}
 
@@ -302,10 +278,8 @@ Melrose, MA 02176\:
 \href{http://www.sumologic.com/}{\textbf{Sumo Logic}}, Redwood City, CA \hfill{Software Engineer Lead, February 2014  | February 2016}
  \begin{outerlist}
 	\item[] \begin{innerlist}[-]
-		\item Lead search performance team to improve search latency and throughput
-		\item Developed optimizer for the Sumo Logic query language
-          	\item Authored \href{https://github.com/SumoLogic/elasticsearch-client}{open source ElasticSearch library}
-		\item Scala, Java, MySQL, Elasticsearch, Cassandra, Lucene, AWS
+		\item Led the search performance team; developed the optimizer for the Sumo Logic query language.
+		\item Authored \href{https://github.com/SumoLogic/elasticsearch-client}{open source ElasticSearch library}
 	    \end{innerlist}
 \end{outerlist}
 
@@ -314,11 +288,8 @@ Melrose, MA 02176\:
 \href{http://www.filestack.com/}{\textbf{Filepicker.io}}, San Francisco, CA \hfill{Principal Engineer, January 2013  | January 2014}
  \begin{outerlist}
  	\item[] \begin{innerlist}[-]
-		\item Scaled highly available service to \textgreater 300QPS while reducing the
+		\item Scaled a highly available service to \textgreater 300QPS while reducing the
 number of servers required
-		\item Optimized use of MongoDB, Nginx, Haproxy, uWSGI
-		\item Python, Node.js, iOS, MongoDB, Postgres, Haproxy,
-Nginx, uWSGI, Flask, EC2, S3 
 	\end{innerlist}
 \end{outerlist}
 
@@ -330,6 +301,14 @@ Nginx, uWSGI, Flask, EC2, S3
 
 \section{Skills}
 Rust, Java, Scala, Python, Go, (my/Postgre)SQL
+
+
+\section{Education}
+\href{http://mit.edu/}{\textbf{Massachusetts Institute of Technology}},
+Cambridge, MA \hfill{June 2013}
+\begin{outerlist}
+\item[] B.S., \href{http://www.eecs.mit.edu/}{Computer Science and Engineering (6--3)}, \textit{GPA:} 4.9/5.0
+\end{outerlist}
 
 
 \section{Interests}
